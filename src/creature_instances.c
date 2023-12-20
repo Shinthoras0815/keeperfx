@@ -1012,7 +1012,7 @@ long instf_tunnel(struct Thing *creatng, long *param)
     MapSubtlCoord stl_x = stl_num_decode_x(cctrl->navi.first_colliding_block);
     MapSubtlCoord stl_y = stl_num_decode_y(cctrl->navi.first_colliding_block);
     struct SlabMap* slb = get_slabmap_for_subtile(stl_x, stl_y);
-    if (slabmap_block_invalid(slb)) {
+    if ((slabmap_block_invalid(slb))  || (slabmap_owner(slb) == creatng->owner) ) {
         return 0;
     }
     thing_play_sample(creatng, 69+UNSYNC_RANDOM(3), NORMAL_PITCH, 0, 3, 0, 2, FULL_LOUDNESS);
