@@ -98,7 +98,7 @@ struct LegacyInitActionPoint { // sizeof = 8
 struct LegacyInitLight { // sizeof=0x14
     short radius;
     unsigned char intensity;
-    unsigned char field_3;
+    unsigned char flags;
     short field_4_unused;
     short field_6_unused;
     short field_8_unused;
@@ -1073,7 +1073,7 @@ TbBool load_slab_datclm_files(void)
       LbMemoryFree(cols);
       return false;
     }
-    long slbset_tot = game.slab_conf.slab_types_count * SLABSETS_PER_SLAB;
+    long slbset_tot = game.conf.slab_conf.slab_types_count * SLABSETS_PER_SLAB;
     game.slabset_num = slbset_tot;
     update_columns_use(cols,cols_tot,game.slabset,slbset_tot);
     create_columns_from_list(cols,cols_tot);
@@ -1246,9 +1246,9 @@ short load_map_slab_file(unsigned long lv_num)
       {
         slb = get_slabmap_block(x,y);
         n = lword(&buf[i]);
-        if (n > game.slab_conf.slab_types_count)
+        if (n > game.conf.slab_conf.slab_types_count)
         {
-          WARNMSG("Slab Type %d exceeds limit of %d",(int)n,game.slab_conf.slab_types_count);
+          WARNMSG("Slab Type %d exceeds limit of %d",(int)n,game.conf.slab_conf.slab_types_count);
           n = SlbT_ROCK;
         }
         slb->kind = n;
@@ -1314,7 +1314,7 @@ static TbBool load_static_light_file(unsigned long lv_num)
         struct InitLight ilght;
         LbMemoryCopy(&legilght, &buf[i], sizeof(struct LegacyInitLight));
         ilght.attached_slb = legilght.attached_slb;
-        ilght.field_3      = legilght.field_3;
+        ilght.flags      = legilght.flags;
         ilght.intensity    = legilght.intensity;
         ilght.is_dynamic   = legilght.is_dynamic;
         ilght.radius       = legilght.radius;

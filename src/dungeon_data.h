@@ -150,6 +150,7 @@ struct Dungeon {
     MapSubtlCoord cta_stl_y;
     unsigned char cta_splevel;
     unsigned long cta_start_turn;
+    TbBool cta_free;
     unsigned long must_obey_turn;
     int hold_audience_cast_turn;
     int scavenge_counters_turn;
@@ -262,6 +263,7 @@ unsigned long gold_pickup_amount;
     /** Index of last creature picked up of given GUI Job. */
     unsigned short selected_creatures_of_gui_job[CREATURE_GUI_JOBS_COUNT];
     unsigned char texture_pack;
+    unsigned char color_idx;
     struct TrapInfo       mnfct_info;
     struct BoxInfo        box_info;
     struct Coord3d        last_combat_location;
