@@ -31,6 +31,7 @@
 #include "dungeon_data.h"
 #include "creature_control.h"
 #include "creature_states.h"
+#include "creature_states_pray.h"
 #include "power_hand.h"
 #include "game_saves.h"
 #include "game_merge.h"
@@ -39,6 +40,7 @@
 #include "map_utils.h"
 #include "spdigger_stack.h"
 #include "thing_corpses.h"
+#include "thing_creature.h"
 #include "thing_objects.h"
 #include "front_simple.h"
 #include "frontend.h"
@@ -447,6 +449,30 @@ void activate_dungeon_special(struct Thing *cratetng, struct PlayerInfo *player)
           used = 1;
           delete_thing_structure(cratetng, 0);
           break;
+        case SpcKind_HealAll:
+            do_to_players_all_creatures_of_model(player->id_number, CREATURE_ANY, update_creature_health_to_max_with_heal_effect);
+            remove_events_thing_is_attached_to(cratetng);
+            used = 1;
+            delete_thing_structure(cratetng, 0);
+            break;
+        case SpcKind_GetGold:
+            throw_out_gold(cratetng, 6666);
+            remove_events_thing_is_attached_to(cratetng);
+            used = 1;
+            delete_thing_structure(cratetng, 0);
+            break;
+        case SpcKind_MakeAngry:
+            for (long i = 0; i < PLAYERS_COUNT; i++)
+            {
+                if (players_are_enemies(player->id_number, i))
+                {
+                    make_all_players_creatures_very_angry(i);
+                }
+            }
+            remove_events_thing_is_attached_to(cratetng);
+            used = 1;
+            delete_thing_structure(cratetng, 0);
+            break;
         case SpcKind_Custom:
         default:
             if (thing_is_custom_special_box(cratetng))
