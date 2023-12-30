@@ -6132,12 +6132,12 @@ msgstr ""
 
 #: guitext:1059
 msgctxt "Dungeon special decription"
-msgid "Heal All: All of your creatures are healed"
+msgid "Heal All: All of your creatures are healed."
 msgstr ""
 
 #: guitext:1060
 msgctxt "Dungeon special decription"
-msgid "Increase Gold: Generates gold in your treasury. "
+msgid "Increase Gold: Generates gold in your treasury."
 msgstr ""
 
 #: guitext:1061
