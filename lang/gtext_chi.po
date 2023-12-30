@@ -6592,5 +6592,5 @@ msgstr "增加黄金：在你的金库中生成黄金。"
 
 #: guitext:1061
 msgctxt "Dungeon special decription"
-msgid "Make Unhappy: All of your creatures becomes upset."
-msgstr "使不高兴：你的所有生物都变得不高兴。"
+msgid "Make Unhappy: All creatures of the enemy become upset."
+msgstr "使不高兴：敌人的所有生物变得不高兴。"

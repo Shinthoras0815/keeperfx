@@ -6963,5 +6963,5 @@ msgstr "Verhoog Goud: Genereert goud in jouw schatkist."
 
 #: guitext:1061
 msgctxt "Dungeon special decription"
-msgid "Make Unhappy: All of your creatures becomes upset."
-msgstr "Maak Ongelukkig: Al jouw wezens worden ongelukkig."
+msgid "Make Unhappy: All creatures of the enemy become upset."
+msgstr "Maak Ongelukkig: Alle wezens van de vijand worden ongelukkig."

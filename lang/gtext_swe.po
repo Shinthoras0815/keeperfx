@@ -6966,5 +6966,5 @@ msgstr "Öka Guld: Genererar guld i din skattkammare."
 
 #: guitext:1061
 msgctxt "Dungeon special decription"
-msgid "Make Unhappy: All of your creatures becomes upset."
-msgstr "Göra Olyckliga: Alla dina varelser blir upprörda."
+msgid "Make Unhappy: All creatures of the enemy become upset."
+msgstr "Göra Olyckliga: Alla varelser av fienden blir upprörda."

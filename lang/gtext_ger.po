@@ -7209,5 +7209,5 @@ msgstr "Gold erzeugen: Erzeugt Gold in eurer Schatzkammer."
 
 #: guitext:1061
 msgctxt "Dungeon special decription"
-msgid "Make Unhappy: All of your creatures becomes upset."
-msgstr "Kreaturen verärgern: Alle deine Kreaturen werden verärgert."
+msgid "Make Unhappy: All creatures of the enemy become upset."
+msgstr "Kreaturen verärgern: Alle Kreaturen des Feindes werden ärgerlich."

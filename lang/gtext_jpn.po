@@ -6844,5 +6844,5 @@ msgstr "ゴールド増加：財宝でゴールドを生成します。"
 
 #: guitext:1061
 msgctxt "Dungeon special decription"
-msgid "Make Unhappy: All of your creatures becomes upset."
-msgstr "不幸にする：すべてのクリーチャーが不幸になります。"
+msgid "Make Unhappy: All creatures of the enemy become upset."
+msgstr "不幸にする： 敵のすべてのクリーチャーが不幸になります。"
