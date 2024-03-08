@@ -1101,6 +1101,8 @@ void first_apply_spell_effect_to_thing(struct Thing *thing, SpellKind spell_idx,
             cctrl->stateblock_flags |= CCSpl_Teleport;
             break;
         case SplK_Rage:
+            cctrl->spell_flags |= CSAfF_MadKilling;
+            cctrl->mad_psycho.byte_9A = 0;
         case SplK_Speed:
         case SplK_Slow:
             cctrl->max_speed = calculate_correct_creature_maxspeed(thing);
@@ -1238,6 +1240,10 @@ void terminate_thing_spell_effect(struct Thing *thing, SpellKind spkind)
     case SplK_Rage:
         cctrl->spell_flags &= ~CSAfF_Rage;
         cctrl->max_speed = calculate_correct_creature_maxspeed(thing);
+       // if (!(anger_is_creature_angry(thing) && crstat->jobs_anger == 6)){
+            cctrl->spell_flags &= ~CSAfF_MadKilling;
+            remove_all_traces_of_combat(thing);
+      //     }
         break;
     case SplK_Speed:
         cctrl->spell_flags &= ~CSAfF_Speed;

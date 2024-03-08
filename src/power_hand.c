@@ -203,7 +203,7 @@ TbBool armageddon_blocks_creature_pickup(const struct Thing *thing, PlayerNumber
 
 long can_thing_be_picked_up_by_player(const struct Thing *thing, PlayerNumber plyr_idx)
 {
-    if (thing_is_creature(thing) && thing_pickup_is_blocked_by_hand_rule(thing, plyr_idx)) {
+    if (thing_is_creature(thing) && (thing_pickup_is_blocked_by_hand_rule(thing, plyr_idx) || thing_pickup_is_blocked_by_spell_effect(thing, plyr_idx))) {
         return false;
     }
     // Some things can be picked not to be placed in hand, but for direct use
@@ -1579,4 +1579,12 @@ TbBool thing_pickup_is_blocked_by_hand_rule(const struct Thing *thing_to_pick, P
     return false;
 }
 
+TbBool thing_pickup_is_blocked_by_spell_effect(const struct Thing *thing_to_pick, PlayerNumber plyr_idx) {
+    if (thing_is_creature(thing_to_pick) && thing_to_pick->owner == plyr_idx) {
+    if (creature_affected_by_spell(thing_to_pick, SplK_Rage)) { 
+        return true;
+        }
+    }
+return false;
+}
 /******************************************************************************/

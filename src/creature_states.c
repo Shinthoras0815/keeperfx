@@ -4979,7 +4979,7 @@ long anger_process_creature_anger(struct Thing *creatng, const struct CreatureSt
     }
     if (!anger_is_creature_angry(creatng)) {
         // If the creature is mad killing, don't allow it not to be angry
-        if ((cctrl->spell_flags & CSAfF_MadKilling) != 0) {
+        if ((cctrl->spell_flags & CSAfF_MadKilling) != 0 && (!(cctrl->spell_flags & CSAfF_Rage))) {
             // Mad creature's mind is tortured, so apply torture anger
             anger_apply_anger_to_creature(creatng, crstat->annoy_in_torture, AngR_Other, 1);
         }
