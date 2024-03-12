@@ -1060,16 +1060,16 @@ void first_apply_spell_effect_to_thing(struct Thing *thing, SpellKind spell_idx,
     {
         fill_spell_slot(thing, i, spell_idx, duration);
         cctrl->spell_flags |= spconf->spell_flags;
+        cctrl->stateblock_flags |= spconf->stateblock_flags;
         switch (spell_idx)
         {
         case SplK_Freeze:
-            cctrl->stateblock_flags |= CCSpl_Freeze;
-            if ((thing->movement_flags & TMvF_Flying) != 0)
+          if ((thing->movement_flags & TMvF_Flying) != 0)
                 {
                     cctrl->spell_flags |= CSAfF_Grounded;
                     thing->movement_flags &= ~TMvF_Flying;
                 }
-            creature_set_speed(thing, 0);
+            creature_set_speed(thing, 0);    
             break;
         case SplK_Armour:
             n = 0;
@@ -1103,6 +1103,7 @@ void first_apply_spell_effect_to_thing(struct Thing *thing, SpellKind spell_idx,
         case SplK_Rage:
             cctrl->spell_flags |= CSAfF_MadKilling;
             cctrl->mad_psycho.byte_9A = 0;
+            break;
         case SplK_Speed:
         case SplK_Slow:
             cctrl->max_speed = calculate_correct_creature_maxspeed(thing);
@@ -1202,12 +1203,14 @@ void terminate_thing_spell_effect(struct Thing *thing, SpellKind spkind)
     TRACE_THING(thing);
     int slot_idx = get_spell_slot(thing, spkind);
     struct CreatureControl* cctrl = creature_control_get_from_thing(thing);
+    const struct SpellConfig* spconf = get_spell_config(spkind);
     long i;
     struct CreatureStats* crstat;
     switch (spkind)
     {
     case SplK_Freeze:
-        cctrl->stateblock_flags &= ~CCSpl_Freeze;
+        cctrl->spell_flags &= ~spconf->spell_flags;
+        cctrl->stateblock_flags &= ~spconf->stateblock_flags;
         if ((cctrl->spell_flags & CSAfF_Grounded) != 0)
         {
             thing->movement_flags |= TMvF_Flying;
@@ -1215,7 +1218,8 @@ void terminate_thing_spell_effect(struct Thing *thing, SpellKind spkind)
         }
         break;
     case SplK_Armour:
-        cctrl->spell_flags &= ~CSAfF_Armour;
+        cctrl->spell_flags &= ~spconf->spell_flags;
+        cctrl->stateblock_flags &= ~spconf->stateblock_flags;
         for (i=0; i < 3; i++)
         {
             ThingIndex eff_idx = cctrl->spell_tngidx_armour[i];

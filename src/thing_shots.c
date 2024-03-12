@@ -1112,6 +1112,7 @@ long shot_hit_creature_at(struct Thing *shotng, struct Thing *trgtng, struct Coo
     long n;
     struct ShotConfigStats* shotst = get_shot_model_stats(shotng->model);
     long amp = shotng->fall_acceleration;
+
     struct Thing* shooter = INVALID_THING;
     if (shotng->parent_idx != shotng->index) {
         shooter = thing_get(shotng->parent_idx);
@@ -1225,9 +1226,8 @@ long shot_hit_creature_at(struct Thing *shotng, struct Thing *trgtng, struct Coo
     if (shotst->push_on_hit != 0 )
     {
         i = amp * (long)shotng->velocity.x.val;
-        trgtng->veloc_push_add.x.val += i / 16;
-        i = amp * (long)shotng->velocity.y.val;
-        trgtng->veloc_push_add.y.val += i / 16;
+        trgtng->veloc_push_add.x.val += shotst->push_on_hit * (long)shotng->velocity.x.val / 16;
+        trgtng->veloc_push_add.y.val += shotst->push_on_hit * (long)shotng->velocity.y.val / 16;
         trgtng->state_flags |= TF1_PushAdd;
     }
     if (creature_is_being_unconscious(trgtng))

@@ -699,7 +699,7 @@ long calculate_correct_creature_maxspeed(const struct Thing *thing)
     if (creature_affected_by_spell(thing, SplK_Rage))
         speed *= 2;
     if (creature_affected_by_spell(thing, SplK_Slow))
-        speed /= 2;
+        speed /= 2;               
     if (!is_neutral_thing(thing))
     {
         dungeon = get_dungeon(thing->owner);

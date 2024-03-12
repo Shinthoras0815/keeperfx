@@ -91,6 +91,7 @@ enum CreatureSpellAffectedFlags {
     CSAfF_Grounded     = 0x08000,
     CSAfF_Timebomb     = 0x10000,
     CSAfF_Rage         = 0x20000,
+    CSAfF_NoPickUp      = 0x40000,
 };
 
 enum PowerKinds {
@@ -222,6 +223,7 @@ enum PowerConfigFlags {
     PwCF_Instinctive  = 0x0001, /**< Set if the power doesn't need to be selected from menu to be activated. */
     PwCF_HasProgress  = 0x0002, /**< Set if the power has a progress bar when active. */
     PwCF_IsParent     = 0x0004, /**< Set if the power has children and is just an aggregate. */
+    PwCF_NoPickUp     = 0x0008, /**< Set if for the duration of the Power no pickup is possible*/ 
 };
 
 /**
@@ -291,7 +293,7 @@ struct ShotConfigStats {
     short size_z;
     unsigned char fall_acceleration;
     unsigned char cast_spell_kind;
-    unsigned char push_on_hit;
+    char push_on_hit;
     unsigned char hidden_projectile;
     unsigned char destroy_on_first_hit;
     short experience_given_to_shooter;
@@ -382,6 +384,7 @@ struct SpellConfig {
     short duration;
     short aura_effect;
     unsigned long spell_flags;
+    unsigned char stateblock_flags;
 };
 
 struct MagicStats {
