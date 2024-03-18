@@ -1650,6 +1650,13 @@ void thing_summon_temporary_creature(struct Thing* creatng, ThingModel model, ch
     }
     else
     {
+        if (count < 0){    
+           count = ((cctrl->explevel+1) / (count*-1)); // neagtive count is used by beeing divided through the summonerlevel
+                if (count == 0){
+                    count++;
+                }
+        }
+        JUSTLOG("summoner level: %i summoncount: %i",cctrl->explevel, count); 
         for (int j = 0; j < count; j++)
         {
             if (j > FAMILIAR_MAX)
