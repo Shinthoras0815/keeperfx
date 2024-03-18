@@ -1652,7 +1652,7 @@ void thing_summon_temporary_creature(struct Thing* creatng, ThingModel model, ch
     {
         if (count < 0){    
            count = ((cctrl->explevel+1) / (count*-1)); // neagtive count is used by beeing divided through the summonerlevel
-                if (count == 0){
+                if (count < 1){
                     count++;
                 }
         }
