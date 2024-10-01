@@ -1786,10 +1786,6 @@ long ranged_combat_move(struct Thing *thing, struct Thing *enmtng, MapCoordDelta
       && creature_instance_has_reset(thing, inst_id)) { \
         return inst_id; \
     }
-#define INSTANCE_RET_NEG_IF_AVAIL_ONLY(thing, inst_id) \
-    if (creature_instance_is_available(thing, inst_id)) { \
-        return -inst_id; \
-    }
 
 TbBool creature_would_benefit_from_healing(const struct Thing* thing)
 {
@@ -1922,29 +1918,52 @@ CrInstance get_self_spell_casting(const struct Thing *thing)
     return CrInst_NULL;
 }
 
-CrInstance get_best_quick_range_instance_to_use(const struct Thing *thing)
+#undef INSTANCE_RET_IF_AVAIL
+
+
+/** @brief Retrieves a random available "QUICK" instance within range for a given creature.
+ * 
+ * Loop through all instances find instances available for the creature and fitting within the given range.
+ * These available instances are added to a list.
+ * The function then chooses a random instance from this list.
+ * 
+ * @param thing Pointer to the creature for which the instance is to be retrieved.
+ * @param dist Distance to the target.
+ * @return A random available "QUICK" CrInstance for the given range
+ */
+CrInstance get_quick_instance_to_use(const struct Thing *thing, unsigned long dist)
 {
-    INSTANCE_RET_IF_AVAIL(thing, CrInst_FIREBALL);
-    INSTANCE_RET_IF_AVAIL(thing, CrInst_FIRE_ARROW);
-    INSTANCE_RET_IF_AVAIL(thing, CrInst_MISSILE);
-    INSTANCE_RET_IF_AVAIL(thing, CrInst_NAVIGATING_MISSILE);
-    INSTANCE_RET_IF_AVAIL(thing, CrInst_LIGHTNING);
-    INSTANCE_RET_IF_AVAIL(thing, CrInst_HAILSTORM);
-    INSTANCE_RET_IF_AVAIL(thing, CrInst_GRENADE);
-    INSTANCE_RET_IF_AVAIL(thing, CrInst_POISON_CLOUD);
-    INSTANCE_RET_NEG_IF_AVAIL_ONLY(thing, CrInst_FIREBALL);
-    INSTANCE_RET_NEG_IF_AVAIL_ONLY(thing, CrInst_FIRE_ARROW);
-    INSTANCE_RET_NEG_IF_AVAIL_ONLY(thing, CrInst_MISSILE);
-    INSTANCE_RET_NEG_IF_AVAIL_ONLY(thing, CrInst_NAVIGATING_MISSILE);
-    INSTANCE_RET_NEG_IF_AVAIL_ONLY(thing, CrInst_LIGHTNING);
-    INSTANCE_RET_NEG_IF_AVAIL_ONLY(thing, CrInst_HAILSTORM);
-    INSTANCE_RET_NEG_IF_AVAIL_ONLY(thing, CrInst_GRENADE);
-    INSTANCE_RET_NEG_IF_AVAIL_ONLY(thing, CrInst_POISON_CLOUD);
+    struct InstanceInfo* inst_inf;
+
+    //List of usable instances
+    CrInstance av_quick_inst[INSTANCE_TYPES_MAX];
+    short av_quick_inst_num = 0;
+
+    // Loop through all instances
+    for (short j = 0; j < game.conf.crtr_conf.instances_count; j++)
+    {
+        inst_inf = creature_instance_info_get(j);
+        // Check if the instance is in range, available, and reset
+        if (inst_inf->instance_property_flags & InstPF_Quick &&
+            (inst_inf->range_min <= dist && inst_inf->range_max >= dist))
+        {
+            if (creature_instance_is_available(thing, j) 
+            && creature_instance_has_reset(thing, j)) 
+            { 
+                // Add instance to list of usable instances
+                av_quick_inst[av_quick_inst_num++] = j;
+            }
+        }
+    }
+    if (av_quick_inst_num > 0)
+    {
+        // Choose a random index from the list of usable instances
+        short rand_inst_idx = CREATURE_RANDOM(thing,av_quick_inst_num);
+        return av_quick_inst[rand_inst_idx];
+    }
+    // Return NULL if no suitable instance is found 
     return CrInst_NULL;
 }
-
-#undef INSTANCE_RET_IF_AVAIL
-#undef INSTANCE_RET_NEG_IF_AVAIL_ONLY
 
 /**
  * Gives combat weapon instance from given array which matches given distance.
