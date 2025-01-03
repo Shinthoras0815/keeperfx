@@ -3333,8 +3333,9 @@ case ShFL_Hail:
         long current_radius = (max_radius * i) / ring_count; // Radius of the current ring
         JUSTLOG("Ring %ld: Current Radius: %ld", i, current_radius);
 
-        // Add rotation for every second ring
-        long ring_rotation = (i % 2 == 0) ? (1024 / (2 * shots_per_ring)) : 0;
+        long azimuth_offset = 1024 / (2 * shots_per_ring);
+        // Add rotation for every second ring for more randomness
+        long ring_rotation = (i % 2 == 0) ? (azimuth_offset) : 0;
 
         for (j = 0; j < shots_per_ring; j++) // Loop through the angles
         {
