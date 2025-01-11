@@ -183,6 +183,21 @@ const struct NamedField rules_workers_named_fields[] = {
   {NULL,                         NULL,                                                                                                            0,        0,         0},
 };
 
+const struct NamedCommand task_desc[] = {
+    {"UNSAVED_UNCONSCIOUS_CREATURE", 0},
+    {"UNCLAIMED_UNCONSCIOUS_BODIES", 1},
+    {"UNCLAIMED_DEAD_BODIES", 2},
+    {"UNCLAIMED_SPELLS", 3},
+    {"EMPTY_TRAPS", 4},
+    {"PRETTY_AND_CONVERT", 5},
+    {"UNDUG", 6},
+    {"UNCLAIMED_GOLD", 7},
+    {"GEMS", 8},
+    {"UNCLAIMED_TRAPS", 9},
+    {"REINFORCE", 10},
+    {NULL, 0}
+};
+
 const struct NamedField rules_health_named_fields[] = {
     //name                           //field                                                //field type                                                    //min      //max
   {"HUNGERHEALTHLOSS",              &game.conf.rules.health.hunger_health_loss,            var_type(game.conf.rules.health.hunger_health_loss           ), LONG_MIN,  LONG_MAX},
@@ -346,6 +361,51 @@ static void set_defaults()
     game.conf.rules.workers.hits_per_slab = 2;
     game.conf.rules.workers.default_imp_dig_damage = 1;
     game.conf.rules.workers.default_imp_dig_own_damage = 2;
+    // Imp task priorities block.
+    //unsaved_unconscious_creature
+    game.conf.rules.imp_task_priorities.task_order[0] = 0; // Reihenfolge festlegen
+    game.conf.rules.imp_task_priorities.max_count[0] = 62; // Maximum pro Task
+    game.conf.rules.imp_task_priorities.min_count[0] = 0;  // Mindestanzahl pro Task
+    //unclaimed_unconscious_bodies
+    game.conf.rules.imp_task_priorities.task_order[1] = 1;
+    game.conf.rules.imp_task_priorities.max_count[1] = 25; 
+    game.conf.rules.imp_task_priorities.min_count[1] = 0;
+    //unclaimed_dead_bodies
+    game.conf.rules.imp_task_priorities.task_order[2] = 2;
+    game.conf.rules.imp_task_priorities.max_count[2] = 25; 
+    game.conf.rules.imp_task_priorities.min_count[2] = 0;
+    // unclaimed_spells
+    game.conf.rules.imp_task_priorities.task_order[3] = 3;
+    game.conf.rules.imp_task_priorities.max_count[3] = 25; 
+    game.conf.rules.imp_task_priorities.min_count[3] = 0;
+    // empty_traps 
+    game.conf.rules.imp_task_priorities.task_order[4] = 4;
+    game.conf.rules.imp_task_priorities.max_count[4] = 16; 
+    game.conf.rules.imp_task_priorities.min_count[4] = 0;
+    // pretty_and_convert
+    game.conf.rules.imp_task_priorities.task_order[5] = 5;
+    game.conf.rules.imp_task_priorities.max_count[5] = 1; 
+    game.conf.rules.imp_task_priorities.min_count[5] = 0;
+    // undug
+    game.conf.rules.imp_task_priorities.task_order[6] = 6;
+    game.conf.rules.imp_task_priorities.max_count[6] = 6; 
+    game.conf.rules.imp_task_priorities.min_count[6] = 0;
+    // unclaimed_gold
+    game.conf.rules.imp_task_priorities.task_order[7] = 7;
+    game.conf.rules.imp_task_priorities.max_count[7] = 1; 
+    game.conf.rules.imp_task_priorities.min_count[7] = 0;
+    // gems
+    game.conf.rules.imp_task_priorities.task_order[8] = 8;
+    game.conf.rules.imp_task_priorities.max_count[8] = 62; 
+    game.conf.rules.imp_task_priorities.min_count[8] = 0;
+    // unclaimed_traps
+    game.conf.rules.imp_task_priorities.task_order[9] = 9;
+    game.conf.rules.imp_task_priorities.max_count[9] = 25; 
+    game.conf.rules.imp_task_priorities.min_count[9] = 0;
+    // reinforce
+    game.conf.rules.imp_task_priorities.task_order[10] = 10;
+    game.conf.rules.imp_task_priorities.max_count[10] = 100; 
+    game.conf.rules.imp_task_priorities.min_count[10] = 0; 
 }
 
 TbBool add_sacrifice_victim(struct SacrificeRecipe *sac, long crtr_idx)
@@ -605,6 +665,57 @@ TbBool parse_rules_research_blocks(char *buf, long len, const char *config_textn
   return true;
 }
 
+TbBool parse_imp_task_prioritization(char *buf, long len, const char *config_textname) {
+    long pos = 0;
+    char block_name[] = "imp_task_prioritization";
+    if (find_conf_block(buf, &pos, len, block_name) < 0) {
+        WARNMSG("Block [%s] not found in %s file.", block_name, config_textname);
+        return false;
+    }
+
+    int task_index = 0;
+    char task_prefix[COMMAND_WORD_LEN];
+    char task_name[COMMAND_WORD_LEN];
+    char word_buf[COMMAND_WORD_LEN];
+    int max_count, min_count;
+
+    while (pos < len) {
+        // Read the prefix (TASK_1, TASK_2, ...)
+        if (get_conf_parameter_single(buf, &pos, len, task_prefix, sizeof(task_prefix)) > 0) {
+            // Skip the “=”
+            if (get_conf_parameter_single(buf, &pos, len, word_buf, sizeof(word_buf)) > 0 && strcmp(word_buf, "=") == 0) {
+                // Read the actual task name
+                if (get_conf_parameter_single(buf, &pos, len, task_name, sizeof(task_name)) > 0) {
+                    if (get_conf_parameter_single(buf, &pos, len, word_buf, sizeof(word_buf)) > 0) {
+                        max_count = atoi(word_buf);
+                        if (get_conf_parameter_single(buf, &pos, len, word_buf, sizeof(word_buf)) > 0) {
+                            min_count = atoi(word_buf);
+
+                            // Get the task ID
+                            int task_id = get_id(task_desc, task_name);
+                            if (task_id < 0) {
+                                WARNMSG("Unknown task \"%s\" in [%s] block.", task_name, block_name);
+                                return false;
+                            }
+
+                            // Enter values in the configuration
+                            game.conf.rules.imp_task_priorities.task_order[task_index] = task_id;
+                            game.conf.rules.imp_task_priorities.max_count[task_id] = max_count;
+                            game.conf.rules.imp_task_priorities.min_count[task_id] = min_count;
+
+                            task_index++;
+                        }
+                    }
+                }
+            }
+        }
+        skip_conf_to_next_line(buf, &pos, len);
+    }
+
+    return true;
+}
+
+
 /**
  * Searches the list of sacrifices for one which is supposed to make special diggers cheaper.
  */
@@ -837,6 +948,14 @@ TbBool load_rules_config_file(const char *textname, const char *fname, unsigned 
     parse_rules_block(buf, len, textname, flags,"magic",    rules_magic_named_fields,    NULL,                   NULL);
     parse_rules_block(buf, len, textname, flags,"computer", rules_computer_named_fields, NULL,                   NULL);
     parse_rules_block(buf, len, textname, flags,"workers",  rules_workers_named_fields,  NULL,                   NULL);
+        if (result)
+    {
+        result = parse_imp_task_prioritization(buf, len, textname);
+        if ((flags & CnfLd_AcceptPartial) != 0)
+            result = true;
+        if (!result)
+            WARNMSG("Parsing %s file \"%s\" imp task prioritization blocks failed.",textname,fname);
+    }
     parse_rules_block(buf, len, textname, flags,"health",   rules_health_named_fields,   NULL,                   NULL);
 
     if (result)
