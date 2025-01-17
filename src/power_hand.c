@@ -879,6 +879,20 @@ long gold_being_dropped_on_creature(long plyr_idx, struct Thing *goldtng, struct
         if (cctrl->paydays_advanced < SCHAR_MAX) {
             cctrl->paydays_advanced++;
         }
+    // Gold fill creature pockets    
+        if(game.conf.rules.game.PayedFromPockets)
+        {
+            struct CreatureStats* crstat = creature_stats_get_from_thing(creatng);
+            GoldAmount addGold = tribute;
+            GoldAmount maxAddGold = crstat->gold_hold - creatng->creature.gold_carried;
+            if (addGold > maxAddGold)
+                {
+                addGold = maxAddGold;
+                }
+            creatng->creature.gold_carried += addGold;
+            //remaining tribute fill happyness
+            tribute -= addGold;
+        }
     }
     struct CreatureStats *crstat;
     crstat = creature_stats_get_from_thing(creatng);

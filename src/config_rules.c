@@ -60,6 +60,7 @@ const struct NamedCommand rules_game_classicbugs_commands[] = {
 
 const struct NamedField rules_game_named_fields[] = {
     //name                        //field                                           //field type                                               //min               //max
+  {"PAYEDFROMPOCKETS",           &game.conf.rules.game.PayedFromPockets,        var_type(game.conf.rules.game.allies_share_vision       ),        0,                  1},
   {"GOLDPERGOLDBLOCK",           &game.conf.rules.game.gold_per_gold_block,        var_type(game.conf.rules.game.gold_per_gold_block       ), LONG_MIN,           LONG_MAX},
   {"POTOFGOLDHOLDS",             &game.conf.rules.game.pot_of_gold_holds,          var_type(game.conf.rules.game.pot_of_gold_holds         ), LONG_MIN,           LONG_MAX},
   {"CHESTGOLDHOLD",              &game.conf.rules.game.chest_gold_hold,            var_type(game.conf.rules.game.chest_gold_hold           ), LONG_MIN,           LONG_MAX},
@@ -292,6 +293,7 @@ static void set_defaults()
     game.conf.rules.game.torture_training_cost = 100;
     game.conf.rules.game.torture_scavenging_cost = 100;
     game.conf.rules.game.creatures_count = 255;
+    game.conf.rules.game.PayedFromPockets = 0;
     // Creature block.
     game.conf.rules.creature.recovery_frequency = 10;
     game.conf.rules.creature.fight_max_hate = 200;

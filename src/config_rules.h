@@ -104,6 +104,7 @@ struct GameRulesConfig {
     long global_ambient_light;
     TbBool light_enabled;
     unsigned short creatures_count;
+    TbBool PayedFromPockets;
 };
 
 struct ComputerRulesConfig {
