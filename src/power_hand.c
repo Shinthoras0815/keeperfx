@@ -879,7 +879,7 @@ long gold_being_dropped_on_creature(long plyr_idx, struct Thing *goldtng, struct
         if (cctrl->paydays_advanced < SCHAR_MAX) {
             cctrl->paydays_advanced++;
         }
-    // Gold fill creature pockets    
+        // Gold fill creature pockets    
         if(game.conf.rules.game.PayedFromPockets)
         {
             struct CreatureStats* crstat = creature_stats_get_from_thing(creatng);
