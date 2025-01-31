@@ -2049,7 +2049,7 @@ static unsigned char count_current_players_count()
 
 void maintain_player_page2(struct GuiButton *gbtn)
 {
-    unsigned char current_players_count = count_current_players_count();   
+    unsigned char current_players_count = count_current_players_count();
     if(current_players_count > 4)
     {
         set_flag(gbtn->flags, (LbBtnF_Visible | LbBtnF_Enabled));

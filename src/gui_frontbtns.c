@@ -966,6 +966,13 @@ void gui_set_menu_mode(struct GuiButton *gbtn)
             mnu_idx = GMnu_TRAP2;
         }
     }
+    else if (mnu_idx == GMnu_QUERY)
+    {
+        if (menu_is_active(GMnu_WORKER))
+        {
+            mnu_idx = GMnu_WORKER;
+        }
+    }
     set_menu_mode(mnu_idx);
 }
 

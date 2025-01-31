@@ -2267,9 +2267,9 @@ MenuNumber create_menu(struct GuiMenu *gmnu)
 
 /**
  * Sets the status menu visiblity.
- * 
+ *
  * Doesn't change anything if the current menu visibility is the same as the passed parameter.
- * 
+ *
  * @param visible If TRUE show the menu, if FALSE hide the menu
  * @return The visibility of the menu before this function was called (used to store the user's previous setting when the menu is forcibly hidden).
  */
@@ -2285,6 +2285,7 @@ unsigned long toggle_status_menu(short visible)
   static TbBool creat_on = false;
   static TbBool event_on = false;
   static TbBool query_on = false;
+  static TbBool worker_on = false;
   static TbBool creature_query1_on = false;
   static TbBool creature_query2_on = false;
   static TbBool creature_query3_on = false;
@@ -2321,6 +2322,8 @@ unsigned long toggle_status_menu(short visible)
         set_menu_visible_on(GMnu_EVENT);
       if ( query_on )
         set_menu_visible_on(GMnu_QUERY);
+      if ( worker_on )
+        set_menu_visible_on(GMnu_WORKER);
       if ( creat_on )
         set_menu_visible_on(GMnu_CREATURE);
       if ( creature_query1_on )
@@ -2345,7 +2348,7 @@ unsigned long toggle_status_menu(short visible)
       if (k >= 0)
         room_on = get_active_menu(k)->is_turned_on;
       set_menu_visible_off(GMnu_ROOM);
-      
+
       k = menu_id_to_number(GMnu_ROOM2);
       if (k >= 0)
         room_2_on = get_active_menu(k)->is_turned_on;
@@ -2355,7 +2358,7 @@ unsigned long toggle_status_menu(short visible)
       if (k >= 0)
         spell_on = get_active_menu(k)->is_turned_on;
       set_menu_visible_off(GMnu_SPELL);
-      
+
       k = menu_id_to_number(GMnu_SPELL2);
       if (k >= 0)
         spell_2_on = get_active_menu(k)->is_turned_on;
@@ -2370,7 +2373,7 @@ unsigned long toggle_status_menu(short visible)
       if (k >= 0)
       trap_on = get_active_menu(k)->is_turned_on;
       set_menu_visible_off(GMnu_TRAP);
-      
+
       k = menu_id_to_number(GMnu_TRAP2);
       if (k >= 0)
         trap_2_on = get_active_menu(k)->is_turned_on;
@@ -2390,6 +2393,11 @@ unsigned long toggle_status_menu(short visible)
       if (k >= 0)
         query_on = get_active_menu(k)->is_turned_on;
       set_menu_visible_off(GMnu_QUERY);
+
+      k = menu_id_to_number(GMnu_WORKER);
+      if (k >= 0)
+        worker_on = get_active_menu(k)->is_turned_on;
+      set_menu_visible_off(GMnu_WORKER);
 
       k = menu_id_to_number(GMnu_CREATURE_QUERY1);
       if (k >= 0)
@@ -2548,6 +2556,18 @@ void initialise_tab_tags(MenuID menu_id)
 {
     info_tag =  (menu_id == GMnu_QUERY) || (menu_id == GMnu_CREATURE_QUERY1) ||
         (menu_id == GMnu_CREATURE_QUERY2) || (menu_id == GMnu_CREATURE_QUERY3) || (menu_id == GMnu_CREATURE_QUERY4);
+    if (menu_id == GMnu_QUERY)
+    {
+        info_tag = 1;
+    }
+    else if (menu_id == GMnu_WORKER)
+    {
+        info_tag = 2;
+    }
+    else
+    {
+        info_tag = 0;
+    }
     if (menu_id == GMnu_ROOM)
     {
         room_tag = 1;

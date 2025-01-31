@@ -192,6 +192,10 @@ void turn_off_all_panel_menus(void)
   {
     turn_off_menu(GMnu_QUERY);
   }
+  if ( menu_is_active(GMnu_WORKER) )
+  {
+    turn_off_menu(GMnu_WORKER);
+  }
   if ( menu_is_active(GMnu_CREATURE) )
   {
     turn_off_menu(GMnu_CREATURE);
@@ -306,9 +310,13 @@ void turn_on_main_panel_menu(void)
   {
     turn_on_menu(GMnu_MAIN);
   }
-  if (info_tag != 0)
+  if (info_tag == 1)
   {
     turn_on_menu(GMnu_QUERY);
+  } else
+  if (info_tag == 2)
+  {
+    turn_on_menu(GMnu_WORKER);
   } else
   if (room_tag == 1)
   {

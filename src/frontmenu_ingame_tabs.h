@@ -72,6 +72,7 @@ extern struct Around const draw_square[];
 extern struct GuiMenu spell_menu2;
 extern struct GuiMenu room_menu2;
 extern struct GuiMenu trap_menu2;
+extern struct GuiMenu worker_menu;
 
 #define AROUND_2x2_PIXEL      4
 #define AROUND_3x3_PIXEL      9
