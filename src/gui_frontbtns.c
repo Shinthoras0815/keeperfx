@@ -524,6 +524,23 @@ void gui_area_new_normal_button(struct GuiButton *gbtn)
     SYNCDBG(12,"Finished");
 }
 
+void gui_area_new_worker_button(struct GuiButton *gbtn)
+{
+    SYNCDBG(10,"Starting");
+    int ps_units_per_px;
+    ps_units_per_px = simple_gui_panel_sprite_width_units_per_px(gbtn, gbtn->sprite_idx, 100);
+    if ((gbtn->flags & LbBtnF_Enabled) != 0)
+    {
+        if (gbtn->gbactn_1){
+        draw_gui_panel_sprite_left(gbtn->scr_pos_x, gbtn->scr_pos_y, ps_units_per_px, gbtn->sprite_idx+1);
+        }else{
+        draw_gui_panel_sprite_rmleft(gbtn->scr_pos_x, gbtn->scr_pos_y, ps_units_per_px, gbtn->sprite_idx, 31);
+        }
+    }
+
+    SYNCDBG(12,"Finished");
+}
+
 void gui_area_new_vertical_button(struct GuiButton *gbtn)
 {
     SYNCDBG(10,"Starting");

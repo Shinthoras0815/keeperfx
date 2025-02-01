@@ -2041,7 +2041,12 @@ int create_button(struct GuiMenu *gmnu, struct GuiButtonInit *gbinit, int units_
     gbtn->width = (gbinit->width * units_per_px + 8) / 16;
     gbtn->height = (gbinit->height * units_per_px + 8) / 16;
     gbtn->draw_call = gbinit->draw_call;
+    if(gbinit->sprite_idx == 448){
+    gbtn->sprite_idx = gbinit->sprite_idx;
+    }
+    else{
     gbtn->sprite_idx = get_player_colored_icon_idx(gbinit->sprite_idx,my_player_number);
+    }
     gbtn->tooltip_stridx = gbinit->tooltip_stridx;
     gbtn->parent_menu = gbinit->parent_menu;
     gbtn->content = gbinit->content;

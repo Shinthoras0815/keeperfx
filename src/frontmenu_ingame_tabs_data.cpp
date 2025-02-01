@@ -346,15 +346,15 @@ struct GuiButtonInit creature_menu_buttons[] = {
 
 GuiButtonInit worker_menu_page_buttons[] =
 {
-    {LbBtnT_HorizSlider, BID_DEFAULT, 0, 0, NULL, NULL, NULL, 0, 10,  60, 10,  60, 80, 20, frontend_draw_slider_button, 0, GUIStr_Empty, 0, {0}, 0, NULL},
-    {LbBtnT_HorizSlider, BID_DEFAULT, 0, 0, NULL, NULL, NULL, 0, 10,  90, 10,  90, 80, 20, frontend_draw_slider_button, 0, GUIStr_Empty, 0, {0}, 0, NULL},
-    {LbBtnT_HorizSlider, BID_DEFAULT, 0, 0, NULL, NULL, NULL, 0, 10, 120, 10, 120, 80, 20, frontend_draw_slider_button, 0, GUIStr_Empty, 0, {0}, 0, NULL},
-    {LbBtnT_NormalBtn,   BID_WRK_NXPG,0, 1, NULL, NULL, NULL, 0, 78, 188, 78, 188, 52, 20, gui_area_new_normal_button, GPS_rpanel_rpanel_btn_nxpage_act, GUIStr_Empty, &query_menu, {0}, 0, NULL},
+    {LbBtnT_HorizSlider, BID_DEFAULT, 0, 0, NULL, NULL, NULL, 0,  4, 216,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, NULL},
+    {LbBtnT_HorizSlider, BID_DEFAULT, 0, 0, NULL, NULL, NULL, 0,  4, 246,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, NULL},
+    {LbBtnT_HorizSlider, BID_DEFAULT, 0, 0, NULL, NULL, NULL, 0,  4, 276,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, NULL},
+    {LbBtnT_NormalBtn,   BID_WRK_NXPG,0, 1, NULL, NULL, NULL, 0, 110, 190,  110, 190, 24, 24, gui_area_new_worker_button, GPS_crspell_dig_std_s, GUIStr_Empty, &query_menu, {0}, 0, NULL},
     {             -1, BID_DEFAULT, 0, 0, NULL, NULL, NULL, 0,  0,   0,  0,   0,  0,  0, NULL,                   0, 0,              0, {0}, 0, NULL},
 };
 
 struct GuiButtonInit query_menu_buttons[] = {
-  {LbBtnT_NormalBtn,    BID_DEFAULT,      0, 0, gui_set_query,                NULL, NULL, 0,  60, 374,  60, 374, 52, 20, gui_area_new_normal_button,    GPS_rpanel_rpanel_btn_crinfo_act,      GUIStr_GoToQueryMode,        0,       {0},            0, maintain_query_button },
+  {LbBtnT_NormalBtn,    BID_DEFAULT,      0, 0, gui_set_query,                NULL, NULL, 0,  44, 374,  44, 374, 52, 20, gui_area_new_normal_button,    GPS_rpanel_rpanel_btn_crinfo_act,      GUIStr_GoToQueryMode,        0,       {0},            0, maintain_query_button },
   {LbBtnT_NormalBtn,    BID_QUERY_2,      0, 0, gui_switch_players_visible,   NULL, NULL, 0,  14, 374,  14, 374, 52, 20, gui_area_new_normal_button,    GPS_rpanel_rpanel_btn_nxpage_act,      GUIStr_MoreInformation,      0,       {0},            0, maintain_player_page2 },
   {LbBtnT_ToggleBtn,    BID_QRY_IMPRSN,   0, 0, gui_set_tend_to, NULL, NULL, 1,  36, 190,  36, 190, 32, 26, gui_area_flash_cycle_button,   GPS_rpanel_tendency_prisne_act,        GUIStr_CreatureImprisonDesc, 0,{.ptr = &game.creatures_tend_imprison}, 1, maintain_prison_bar },
   {LbBtnT_ToggleBtn,    BID_QRY_FLEE,     0, 0, gui_set_tend_to, NULL, NULL, 2,  74, 190,  74, 190, 32, 26, gui_area_flash_cycle_button,   GPS_rpanel_tendency_fleee_act,         GUIStr_CreatureFleeDesc,     0,{.ptr = &game.creatures_tend_flee}, 1, NULL },
@@ -373,7 +373,7 @@ struct GuiButtonInit query_menu_buttons[] = {
   {LbBtnT_NormalBtn,    BID_DEFAULT,      0, 0, gui_toggle_ally, NULL, NULL, 0,  62, 298,  62, 298, 14, 22, gui_area_ally,                 0,                                     GUIStr_AllyWithPlayer,       0,       {1},            0, maintain_ally },
   {LbBtnT_NormalBtn,    BID_DEFAULT,      0, 0, gui_toggle_ally, NULL, NULL, 0,  62, 322,  62, 322, 14, 22, gui_area_ally,                 0,                                     GUIStr_AllyWithPlayer,       0,       {2},            0, maintain_ally },
   {LbBtnT_NormalBtn,    BID_DEFAULT,      0, 0, gui_toggle_ally, NULL, NULL, 0,  62, 346,  62, 346, 14, 22, gui_area_ally,                 0,                                     GUIStr_AllyWithPlayer,       0,       {3},            0, maintain_ally },
-  {LbBtnT_NormalBtn,    BID_WRK_NXPG,    0, 1, NULL,            NULL, NULL, 0,  78, 188,  78, 188, 52, 20, gui_area_new_normal_button, GPS_rpanel_rpanel_btn_nxpage_act, GUIStr_Empty, &worker_menu, {0}, 0, NULL},
+  {LbBtnT_NormalBtn,    BID_WRK_NXPG,     0, 1, NULL,            NULL, NULL, 0,  110, 190,  110, 190, 24, 24, gui_area_new_worker_button,  GPS_crspell_dig_std_s,                 GUIStr_Empty,                &worker_menu, {0},       0, maintain_worker_button},
   {              -1,    BID_DEFAULT,      0, 0, NULL,            NULL, NULL, 0,   0,   0,   0,   0,  0,  0, NULL,                          0,                                     0,                           0,       {0},            0, NULL },
 };
 

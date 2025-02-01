@@ -2076,6 +2076,13 @@ void maintain_query_button(struct GuiButton *gbtn)
 
 }
 
+void maintain_worker_button(struct GuiButton *gbtn)
+{
+        //gbtn->pos_y = scale_ui_value(74);
+        //gbtn->pos_x = scale_ui_value(74);
+        //gbtn->scr_pos_x = scale_ui_value(30);
+}
+
 void maintain_ally(struct GuiButton *gbtn)
 {
     PlayerNumber plyr_idx = info_panel_pos_to_player_number(gbtn->content.lval);
