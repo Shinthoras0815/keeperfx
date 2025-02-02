@@ -243,6 +243,7 @@ struct Dungeon {
     struct DiggerStack digger_stack[DIGGER_TASK_MAX_COUNT];
     unsigned long digger_stack_update_turn;
     unsigned long digger_stack_length;
+    char digger_priority[10];
     unsigned char visible_event_idx;
     /** Array with battle indexes with the battles currently visible in fight event message */
     unsigned char visible_battles[3];

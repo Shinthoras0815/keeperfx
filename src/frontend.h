@@ -225,7 +225,18 @@ enum IngameButtonDesignationIDs {
     BID_MNFCT_TD32,
     BID_MNFCT_NXPG,
     BID_QUERY_2,
-    BID_WRK_NXPG
+    BID_WRK_NXPG, //135
+    BID_WRK_SLDR1,
+    BID_WRK_SLDR2,
+    BID_WRK_SLDR3,
+    BID_WRK_SLDR4,
+    BID_WRK_SLDR5, //140
+    BID_WRK_SLDR6,
+    BID_WRK_SLDR7,
+    BID_WRK_SLDR8,
+    BID_WRK_SLDR9,
+    BID_WRK_SLDR10, //145
+    BID_WRK_SLDR11
 };
 
 struct GuiMenu;

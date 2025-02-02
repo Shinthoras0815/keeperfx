@@ -57,6 +57,7 @@
 #include "frontmenu_ingame_evnt.h"
 #include "frontmenu_ingame_opts.h"
 #include "frontmenu_ingame_map.h"
+#include "frontmenu_options.h"
 #include "frontend.h"
 #include "front_input.h"
 #include "game_legacy.h"
@@ -2076,11 +2077,21 @@ void maintain_query_button(struct GuiButton *gbtn)
 
 }
 
-void maintain_worker_button(struct GuiButton *gbtn)
+/*Set Slider after loading menu*/
+void maintain_worker_slider(struct GuiButton *gbtn)
 {
-        //gbtn->pos_y = scale_ui_value(74);
-        //gbtn->pos_x = scale_ui_value(74);
-        //gbtn->scr_pos_x = scale_ui_value(30);
+    struct PlayerInfo* player = get_my_player();
+    struct Dungeon* dungeon = get_players_dungeon(player);
+
+    const int min_id = BID_WRK_SLDR1;
+    const int max = 11;
+    int id_num = gbtn->id_num;
+    int priority_index = id_num - min_id;
+
+    // validate array index
+    if(priority_index >= 0 && priority_index < max){
+        get_gui_button_init((get_active_menu(gbtn->gmenu_idx)), id_num)->content.lval = make_audio_slider_linear(dungeon->digger_priority[priority_index]);
+    }
 }
 
 void maintain_ally(struct GuiButton *gbtn)

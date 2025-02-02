@@ -31,6 +31,7 @@
 #include "gui_frontmenu.h"
 #include "frontend.h"
 #include "front_input.h"
+#include "frontmenu_options.h"
 #include "sprites.h"
 #include "game_legacy.h"
 #include "custom_sprites.h"
@@ -539,6 +540,24 @@ void gui_area_new_worker_button(struct GuiButton *gbtn)
     }
 
     SYNCDBG(12,"Finished");
+}
+
+void gui_set_Worker_slider(struct GuiButton *gbtn)
+{
+    const int new_val = make_audio_slider_nonlinear(gbtn->slide_val);
+    struct PlayerInfo* player = get_my_player();
+    struct Dungeon* dungeon = get_players_dungeon(player);
+
+    const short base_id = 136; //BID_WRK_SLDR1
+    const char max = 11; //BID_WRK_SLDR11
+
+    // calculate array indes based on button-ID
+    short priority_index = gbtn->id_num - base_id;
+
+    // validate array index
+    if(priority_index >= 0 && priority_index < max){
+        dungeon->digger_priority[priority_index] = new_val;
+    }
 }
 
 void gui_area_new_vertical_button(struct GuiButton *gbtn)

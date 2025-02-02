@@ -49,6 +49,7 @@ void frontend_copy_background(void);
 
 void gui_area_new_normal_button(struct GuiButton *gbtn);
 void gui_area_new_worker_button(struct GuiButton *gbtn);
+void gui_set_Worker_slider(struct GuiButton *gbtn);
 void gui_area_new_vertical_button(struct GuiButton *gbtn);
 void gui_area_new_null_button(struct GuiButton *gbtn);
 void gui_area_new_no_anim_button(struct GuiButton *gbtn);
