@@ -118,6 +118,7 @@ long get_random_mining_undug_area_position_for_digger_drop(PlayerNumber plyr_idx
 TbBool creature_can_pickup_library_object_at_subtile(struct Thing* spdigtng, MapSubtlCoord stl_x, MapSubtlCoord stl_y);
 
 TbBool imp_stack_update(struct Thing *creatng);
+TbBool add_task_to_imp_stack(struct Dungeon *dungeon, int task_type, int tasks_add);
 TbBool check_out_imp_stack(struct Thing *creatng);
 long check_out_imp_last_did(struct Thing *creatng);
 long check_place_to_convert_excluding(struct Thing *thing, MapSlabCoord slb_x, MapSlabCoord slb_y);

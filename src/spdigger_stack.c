@@ -2863,34 +2863,95 @@ long check_out_imp_last_did(struct Thing *creatng)
   return false;
 }
 //Create list of up to 64 tasks.
+// Updates the imp task stack based on priorities and existing tasks.
 TbBool imp_stack_update(struct Thing *creatng)
 {
     struct Dungeon *dungeon;
-    SYNCDBG(18,"Starting");
+    SYNCDBG(18, "Starting");
+    
+    // Retrieve the owner's dungeon
     dungeon = get_dungeon(creatng->owner);
-    if ((game.play_gameturn - dungeon->digger_stack_update_turn) < 128)
-        return 0;
-    SYNCDBG(8,"Updating");
-    setup_imp_stack(dungeon);
     if (dungeon_invalid(dungeon)) {
-        WARNLOG("Played %d has no dungeon",(int)creatng->owner);
+        WARNLOG("Player %d has no dungeon", (int)creatng->owner);
         return false;
     }
-    add_unsaved_unconscious_creature_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT*5/8);
-    add_unclaimed_unconscious_bodies_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT/4 - 1);
-    add_unclaimed_dead_bodies_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT/4 - 1);
-    add_unclaimed_spells_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT/4 - 1);
-    add_empty_traps_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT/6);
-    add_pretty_and_convert_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT/64);
-    add_undug_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT/16 - 1);
-    add_unclaimed_gold_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT/64);
-    add_gems_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT*5/8);
-    add_unclaimed_traps_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT/4);
-    add_undug_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT*5/8);
-    add_pretty_and_convert_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT*5/8);
-    add_unclaimed_gold_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT/3);
-    add_reinforce_to_imp_stack(dungeon, DIGGER_TASK_MAX_COUNT);
+
+    // Check update interval
+    if ((game.play_gameturn - dungeon->digger_stack_update_turn) < 128) {
+        return false; // No update required
+    }
+    dungeon->digger_stack_update_turn = game.play_gameturn;
+
+    // Prepare imp stack
+    setup_imp_stack(dungeon);
+
+    // Saves the current number per task type in the stack
+    int task_counts[11] = {0};
+
+    // Count existing tasks in the stack
+    for (int i = 0; i < dungeon->digger_stack_length; i++) {
+        int task_type = dungeon->digger_stack[i].task_type;
+        if (task_type >= 0 && task_type < 11) {
+            task_counts[task_type]++;
+        }
+    }
+
+    // Process tasks based on priorities
+    for (int priority = 0; priority < 11; priority++) {
+        int task_type = game.conf.rules.imp_task_priorities.task_order[priority];
+        int min_count = game.conf.rules.imp_task_priorities.min_count[task_type];
+        int max_count = game.conf.rules.imp_task_priorities.max_count[task_type];
+
+        // If the current number is below the minimum number, we add tasks
+        while (task_counts[task_type] < min_count) {
+            if (!add_task_to_imp_stack(dungeon, task_type, min_count)) {
+                WARNLOG("Failed to add task of type %d to stack", task_type);
+                break;
+            }
+            task_counts[task_type]++;
+        }
+
+        // If the current number is below the maximum number, we add more tasks
+        while (task_counts[task_type] < max_count) {
+            if (!add_task_to_imp_stack(dungeon, task_type, max_count)) {
+                break; // No further tasks available
+            }
+            task_counts[task_type]++;
+        }
+    }
+
     return true;
+}
+
+TbBool add_task_to_imp_stack(struct Dungeon *dungeon, int task_type, int tasks_add)
+{
+    // Calls the specific function to add tasks
+    switch (task_type) {
+        case 0:
+            return add_unsaved_unconscious_creature_to_imp_stack(dungeon, tasks_add);
+        case 1: 
+            return add_unclaimed_unconscious_bodies_to_imp_stack(dungeon, tasks_add);
+        case 2: 
+            return add_unclaimed_dead_bodies_to_imp_stack(dungeon, tasks_add);
+        case 3: 
+            return add_unclaimed_spells_to_imp_stack(dungeon, tasks_add);
+        case 4: 
+            return add_empty_traps_to_imp_stack(dungeon, tasks_add);
+        case 5: 
+            return add_pretty_and_convert_to_imp_stack(dungeon, tasks_add);
+        case 6: 
+            return add_undug_to_imp_stack(dungeon, tasks_add);
+        case 7: 
+            return add_unclaimed_gold_to_imp_stack(dungeon, tasks_add);
+        case 8: 
+            return add_gems_to_imp_stack(dungeon, tasks_add);
+        case 9: 
+            return add_unclaimed_traps_to_imp_stack(dungeon, tasks_add);
+        case 10: 
+            return add_reinforce_to_imp_stack(dungeon, tasks_add);
+        default: 
+            return false;
+    }
 }
 
 long check_out_worker_improve_dungeon(struct Thing *thing, struct DiggerStack *dstack)

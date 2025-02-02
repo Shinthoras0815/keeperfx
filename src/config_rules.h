@@ -170,6 +170,12 @@ struct WorkersRulesConfig {
     unsigned short drag_to_lair;
 };
 
+struct ImpTaskPriorities {
+    int task_order[11];  // Array to store the order of tasks
+    int max_count[11];   // Array to store max counts per task
+    int min_count[11];   // Array to store min counts per task
+};
+
 struct HealthRulesConfig {
     HitPoints hunger_health_loss;
     unsigned short turns_per_hunger_health_loss;
@@ -192,6 +198,7 @@ struct RulesConfig {
     struct WorkersRulesConfig workers;
     struct HealthRulesConfig health;
     struct SacrificesRulesConfig sacrifices;
+    struct ImpTaskPriorities imp_task_priorities;
 };
 /******************************************************************************/
 extern const char keeper_rules_file[];
