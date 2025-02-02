@@ -153,7 +153,7 @@ struct CreatureControl {
     ThingIndex players_prev_creature_idx;
     ThingIndex players_next_creature_idx;
     unsigned short slap_turns;
-    unsigned char explevel;
+    CrtrExpLevel exp_level;
     long exp_points;
     long prev_exp_points;
     struct Coord3d moveto_pos;
@@ -238,8 +238,8 @@ unsigned char sound_flag;
   union {
   struct {
     GameTurn start_gameturn;
-    GameTurn gameturn_9Ex;
-    GameTurn gameturn_A2x;
+    GameTurn state_start_turn;
+    GameTurn torturer_start_turn;
     ThingIndex assigned_torturer;
     unsigned char vis_state;
   } tortured;
@@ -276,7 +276,7 @@ unsigned char sound_flag;
     GameTurn last_mood_sound_turn;
   } imprison;
   struct {
-    unsigned char byte_9A;
+    unsigned char job_stage;
     unsigned char swing_weapon_counter;
     MapSubtlCoord stl_x;
     MapSubtlCoord stl_y;
@@ -307,15 +307,6 @@ unsigned char sound_flag;
     short word_9A;
     short word_9C;
   }sacrifice;
-  struct {
-    unsigned char byte_9A;
-  }mad_psycho;
-
-  struct {
-    unsigned char byte_9A;
-  }unknown_state;
-
-
 
   };
     unsigned char fight_til_death;
@@ -451,7 +442,7 @@ struct CreatureStats { // These stats are not compatible with original DK - they
     unsigned long to_level[CREATURE_MAX_LEVEL];
     unsigned char base_speed;
     ThingModel grow_up;
-    unsigned char grow_up_level;
+    CrtrExpLevel grow_up_level;
     TbBool entrance_force;
     short max_turning_speed;
     short base_eye_height;

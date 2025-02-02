@@ -460,16 +460,14 @@ TbBool parse_objects_object_blocks(char *buf, long len, const char *config_textn
             case 18: // MAPICON
                 if (get_conf_parameter_single(buf, &pos, len, word_buf, sizeof(word_buf)) > 0)
                 {
-                    k = get_icon_id(word_buf);
-                    if (k >= -1)
+                    objst->map_icon = get_icon_id(word_buf);
+                    if (objst->map_icon != bad_icon_id)
                     {
-                        objst->map_icon = k;
                         n++;
                     }
                 }
                 if (n <= 0)
                 {
-                    objst->map_icon = bad_icon_id;
                     CONFWRNLOG("Incorrect value of \"%s\" parameter in [%.*s] block of %s file.",
                         COMMAND_TEXT(cmd_num), blocknamelen, blockname, config_textname);
                 }
@@ -478,7 +476,7 @@ TbBool parse_objects_object_blocks(char *buf, long len, const char *config_textn
                 if (get_conf_parameter_single(buf, &pos, len, word_buf, sizeof(word_buf)) > 0)
                 {
                     k = atoi(word_buf);
-                    if ( (!SoundDisabled) && ( (k < 0) || (k > (samples_in_bank - 1)) ) )
+                    if (k < 0)
                     {
                         CONFWRNLOG("Incorrect value of \"%s\" parameter in [%.*s] block of %s file.",
                         COMMAND_TEXT(cmd_num), blocknamelen, blockname, config_textname);
@@ -649,7 +647,7 @@ TbBool parse_objects_object_blocks(char *buf, long len, const char *config_textn
                 if (get_conf_parameter_single(buf, &pos, len, word_buf, sizeof(word_buf)) > 0)
                 {
                     n = atoi(word_buf);
-                    if ( (!SoundDisabled) && ( (n < 0) || (n > (samples_in_bank - 1)) ) )
+                    if (n < 0)
                     {
                         CONFWRNLOG("Incorrect value of \"%s\" parameter in [%.*s] block of %s file.",
                         COMMAND_TEXT(cmd_num), blocknamelen, blockname, config_textname);
@@ -662,7 +660,7 @@ TbBool parse_objects_object_blocks(char *buf, long len, const char *config_textn
                 if (get_conf_parameter_single(buf, &pos, len, word_buf, sizeof(word_buf)) > 0)
                 {
                     n = atoi(word_buf);
-                    if ((!SoundDisabled) && ((n < 0) || (n > (samples_in_bank - 1))))
+                    if (n < 0)
                     {
                         objst->effect.sound_range = 1;
                     }
