@@ -247,9 +247,9 @@ TbBool dungeon_has_room_of_role(const struct Dungeon *dungeon, RoomRole rrole)
             }
         }
     }
-    
+
     return false;
-        
+
 }
 
 TbBool player_creature_tends_to(PlayerNumber plyr_idx, unsigned short tend_type)
@@ -534,6 +534,11 @@ void init_dungeons(void)
         dungeon->modifier.scavenging_cost = 100;
         dungeon->modifier.loyalty = 100;
         dungeon->color_idx = i;
+        for (int j = 0; j < DIGGER_TASKS; j++) {
+            dungeon->worker_task_order[j] = game.conf.rules.imp_task_priorities.task_order[j];
+            dungeon->worker_task_max_count[j] = game.conf.rules.imp_task_priorities.max_count[j];
+            dungeon->worker_task_min_count[j] = game.conf.rules.imp_task_priorities.min_count[j];
+        }
         memset(dungeon->creature_models_joined, 0, CREATURE_TYPES_MAX);
     }
 }

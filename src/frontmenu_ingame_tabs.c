@@ -2090,7 +2090,9 @@ void maintain_worker_slider(struct GuiButton *gbtn)
 
     // validate array index
     if(priority_index >= 0 && priority_index < max){
-        get_gui_button_init((get_active_menu(gbtn->gmenu_idx)), id_num)->content.lval = make_audio_slider_linear(dungeon->digger_priority[priority_index]);
+        int slider_val = make_audio_slider_linear(dungeon->worker_task_max_count[priority_index]);
+        get_gui_button_init((get_active_menu(gbtn->gmenu_idx)), id_num)->content.lval = slider_val;
+        gbtn->slide_val = slider_val;
     }
 }
 

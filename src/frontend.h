@@ -236,7 +236,18 @@ enum IngameButtonDesignationIDs {
     BID_WRK_SLDR8,
     BID_WRK_SLDR9,
     BID_WRK_SLDR10, //145
-    BID_WRK_SLDR11
+    BID_WRK_SLDR11,
+    BID_WRK_MAX_MIN1,
+    BID_WRK_MAX_MIN2,
+    BID_WRK_MAX_MIN3,
+    BID_WRK_MAX_MIN4, //150
+    BID_WRK_MAX_MIN5,
+    BID_WRK_MAX_MIN6,
+    BID_WRK_MAX_MIN7,
+    BID_WRK_MAX_MIN8,
+    BID_WRK_MAX_MIN9, //155
+    BID_WRK_MAX_MIN10,
+    BID_WRK_MAX_MIN11
 };
 
 struct GuiMenu;
@@ -349,6 +360,8 @@ void frontend_main_menu_highscores_maintain(struct GuiButton *gbtn);
 void maintain_loadsave(struct GuiButton *gbtn);
 void gui_quit_game(struct GuiButton *gbtn);
 void gui_area_slider(struct GuiButton *gbtn);
+void gui_area_worker_max_info(struct GuiButton *gbtn);
+void gui_worker_slider(struct GuiButton *gbtn);
 void frontend_draw_icon(struct GuiButton *gbtn);
 void frontend_draw_error_text_box(struct GuiButton *gbtn);
 void frontend_maintain_error_text_box(struct GuiButton *gbtn);

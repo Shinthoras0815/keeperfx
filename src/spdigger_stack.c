@@ -2868,7 +2868,7 @@ TbBool imp_stack_update(struct Thing *creatng)
 {
     struct Dungeon *dungeon;
     SYNCDBG(18, "Starting");
-    
+
     // Retrieve the owner's dungeon
     dungeon = get_dungeon(creatng->owner);
     if (dungeon_invalid(dungeon)) {
@@ -2898,9 +2898,9 @@ TbBool imp_stack_update(struct Thing *creatng)
 
     // Process tasks based on priorities
     for (int priority = 0; priority < 11; priority++) {
-        int task_type = game.conf.rules.imp_task_priorities.task_order[priority];
-        int min_count = game.conf.rules.imp_task_priorities.min_count[task_type];
-        int max_count = game.conf.rules.imp_task_priorities.max_count[task_type];
+        int task_type = dungeon->worker_task_order[priority];
+        int min_count = dungeon->worker_task_min_count[task_type];
+        int max_count = dungeon->worker_task_max_count[task_type];
 
         // If the current number is below the minimum number, we add tasks
         while (task_counts[task_type] < min_count) {
@@ -2929,27 +2929,27 @@ TbBool add_task_to_imp_stack(struct Dungeon *dungeon, int task_type, int tasks_a
     switch (task_type) {
         case 0:
             return add_unsaved_unconscious_creature_to_imp_stack(dungeon, tasks_add);
-        case 1: 
+        case 1:
             return add_unclaimed_unconscious_bodies_to_imp_stack(dungeon, tasks_add);
-        case 2: 
+        case 2:
             return add_unclaimed_dead_bodies_to_imp_stack(dungeon, tasks_add);
-        case 3: 
+        case 3:
             return add_unclaimed_spells_to_imp_stack(dungeon, tasks_add);
-        case 4: 
+        case 4:
             return add_empty_traps_to_imp_stack(dungeon, tasks_add);
-        case 5: 
+        case 5:
             return add_pretty_and_convert_to_imp_stack(dungeon, tasks_add);
-        case 6: 
+        case 6:
             return add_undug_to_imp_stack(dungeon, tasks_add);
-        case 7: 
+        case 7:
             return add_unclaimed_gold_to_imp_stack(dungeon, tasks_add);
-        case 8: 
+        case 8:
             return add_gems_to_imp_stack(dungeon, tasks_add);
-        case 9: 
+        case 9:
             return add_unclaimed_traps_to_imp_stack(dungeon, tasks_add);
-        case 10: 
+        case 10:
             return add_reinforce_to_imp_stack(dungeon, tasks_add);
-        default: 
+        default:
             return false;
     }
 }

@@ -46,6 +46,7 @@ extern "C" {
 /******************************************************************************/
 #define DUNGEONS_COUNT              9
 #define DIGGER_TASK_MAX_COUNT       64
+#define DIGGER_TASKS                11
 #define DUNGEON_RESEARCH_COUNT      2000
 #define MAX_THINGS_IN_HAND          64
 #define TURN_TIMERS_COUNT           8
@@ -244,6 +245,9 @@ struct Dungeon {
     unsigned long digger_stack_update_turn;
     unsigned long digger_stack_length;
     char digger_priority[10];
+    int worker_task_order[DIGGER_TASKS];
+    int worker_task_max_count[DIGGER_TASKS];
+    int worker_task_min_count[DIGGER_TASKS];
     unsigned char visible_event_idx;
     /** Array with battle indexes with the battles currently visible in fight event message */
     unsigned char visible_battles[3];

@@ -548,7 +548,7 @@ void gui_set_Worker_slider(struct GuiButton *gbtn)
     struct PlayerInfo* player = get_my_player();
     struct Dungeon* dungeon = get_players_dungeon(player);
 
-    const short base_id = 136; //BID_WRK_SLDR1
+    const short base_id = BID_WRK_SLDR1; //BID_WRK_SLDR1
     const char max = 11; //BID_WRK_SLDR11
 
     // calculate array indes based on button-ID
@@ -556,7 +556,7 @@ void gui_set_Worker_slider(struct GuiButton *gbtn)
 
     // validate array index
     if(priority_index >= 0 && priority_index < max){
-        dungeon->digger_priority[priority_index] = new_val;
+        dungeon->worker_task_max_count[priority_index] = new_val;
     }
 }
 

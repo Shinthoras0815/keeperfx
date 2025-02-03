@@ -1164,6 +1164,109 @@ void gui_area_slider(struct GuiButton *gbtn)
     LbSpriteDrawResized(gbtn->scr_pos_x + shift_x + 24*units_per_px/16, gbtn->scr_pos_y + 6*units_per_px/16, bs_units_per_px, spr);
 }
 
+void draw_workerslider64k(long scr_x, long scr_y, int units_per_px, long width)
+{
+    // Inner size
+    ScreenCoord x = scr_x;
+    ScreenCoord y = scr_y;
+    TbBool low_res = (MyScreenHeight < 400);
+    if (low_res)
+    {
+        x -= 16;
+        y -= 5;
+    }
+    int base_x = x + 32*units_per_px/16;
+    int base_y = y + 10*units_per_px/16;
+    int base_w = width - 64*units_per_px/16;
+    int end_x = base_x + base_w - 64*units_per_px/16;
+    if (low_res)
+    {
+        end_x += 32;
+    }
+    int cur_x = base_x;
+    int cur_y = base_y;
+    // int end_x = base_x + base_w - 64*units_per_px/16;
+    const struct TbSprite *spr = get_button_sprite(GBS_borders_bar_std_l);
+    LbSpriteDrawResized(cur_x, cur_y, units_per_px, spr);
+    cur_x += spr->SWidth*units_per_px/16;
+    spr = get_button_sprite(GBS_borders_bar_std_c);
+    while (cur_x < end_x)
+    {
+        LbSpriteDrawResized(cur_x, cur_y, units_per_px, spr);
+        cur_x += spr->SWidth*units_per_px/16;
+    }
+    cur_x = end_x;
+    LbSpriteDrawResized(cur_x/pixel_size, cur_y/pixel_size, units_per_px, spr);
+    cur_x += spr->SWidth*units_per_px/16;
+    spr = get_button_sprite(GBS_borders_bar_std_r);
+    LbSpriteDrawResized(cur_x/pixel_size, cur_y/pixel_size, units_per_px, spr);
+}
+
+void gui_area_worker_max_info(struct GuiButton *gbtn)
+{
+    struct PlayerInfo* player = get_my_player();
+    struct Dungeon* dungeon = get_players_dungeon(player);
+
+    const int min_id = BID_WRK_MAX_MIN1;
+    const int max = 11;
+    int id_num = gbtn->id_num;
+    int priority_index = id_num - min_id;
+
+
+
+    // validate array index
+    if(priority_index >= 0 && priority_index < max){
+        //LbSpriteDrawResized
+        // Get your sprite pointer (e.g., from get_button_sprite or similar)
+        const struct TbSprite *sprite = get_panel_sprite(GPS_rpanel_frame_rect_wide_up);
+        // Compute your desired destination size.
+        // Here, 'ps_units_per_px' is used to compute scale factors.
+        int dest_width = (sprite->SWidth * 7) / 16; // adjust factor as needed
+        int dest_height = (sprite->SHeight * 15) / 16; // adjust factor as needed
+        // Adjust x, y as needed; here we center it.
+        long draw_x = gbtn->scr_pos_x + 35;
+        long draw_y = gbtn->scr_pos_y + 7;
+        // Draw the sprite scaled to your destination width and height.
+        LbSpriteDrawScaled(draw_x, draw_y, sprite, dest_width, dest_height);
+        // Adjust x, y as needed; here we center it.
+        draw_x = gbtn->scr_pos_x + 62;
+        draw_y = gbtn->scr_pos_y + 7;
+        // Draw the sprite scaled to your destination width and height.
+        LbSpriteDrawScaled(draw_x, draw_y, sprite, dest_width, dest_height);
+
+        char* max_count = buf_sprintf("%u", dungeon->worker_task_max_count[priority_index]);
+        draw_button_string(gbtn, 90, max_count);
+        char* min_count = buf_sprintf("%u", dungeon->worker_task_min_count[priority_index]);
+        int base_w = 17;
+        draw_string64k(draw_x +4,draw_y -3, base_w,min_count);
+    }
+}
+
+void gui_worker_slider(struct GuiButton *gbtn)
+{
+    if ((gbtn->flags & LbBtnF_Enabled) == 0) {
+        return;
+    }
+    int units_per_px = (gbtn->height*16 + 30/2) / 30;
+    int bs_units_per_px = simple_button_sprite_height_units_per_px(gbtn, GBS_frontend_button_std_c, 100);
+    int bar_width = gbtn->width;
+    if (MyScreenHeight < 400)
+    {
+        bar_width += 32;
+    }
+    draw_workerslider64k(gbtn->scr_pos_x, gbtn->scr_pos_y, bs_units_per_px, bar_width);
+    int shift_x = (gbtn->width - 64*units_per_px/16) * gbtn->slide_val >> 8;
+    const struct TbSprite *spr;
+    if (gbtn->flags != 0) {
+        spr = get_button_sprite(GBS_guisymbols_jewel_on);
+    } else {
+        spr = get_button_sprite(GBS_guisymbols_jewel_off);
+    }
+    LbSpriteDrawResized(gbtn->scr_pos_x + shift_x + 24*units_per_px/16, gbtn->scr_pos_y + 6*units_per_px/16+6, bs_units_per_px/2, spr);
+
+    gui_area_worker_max_info(gbtn);
+}
+
 #if (BFDEBUG_LEVEL > 0)
 // Code for font testing screen (debug version only)
 TbBool fronttestfont_draw(void)

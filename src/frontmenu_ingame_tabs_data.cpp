@@ -346,18 +346,23 @@ struct GuiButtonInit creature_menu_buttons[] = {
 
 GuiButtonInit worker_menu_page_buttons[] =
 {
-    {LbBtnT_HorizSlider, BID_WRK_SLDR1, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 216,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR2, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 236,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR3, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 256,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR4, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 276,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR5, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 296,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR6, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 316,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR7, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 336,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR8, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 356,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR9, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 276,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR10, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 396,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_HorizSlider, BID_WRK_SLDR11, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 416,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 0, maintain_worker_slider},
-    {LbBtnT_NormalBtn,   BID_WRK_NXPG,0, 1, NULL, NULL, NULL, 0, 110, 190,  110, 190, 24, 24, gui_area_new_worker_button, GPS_crspell_dig_std_s, GUIStr_Empty, &query_menu, {0}, 0, NULL},
+  //1 gbtype //2 id_num //3 unused //4 unkown flag //5 click_event //6 rclick_event //7 ptover_event //8 btype_value //9 scr_pos_x//10 scr_pos_y //11 pos_x //12 pos_y
+  //13 width //14 height //15 draw_call //16 sprite_idx //17 tooltip_stridx //18 parent_menu //19 content //20 maxval //21 maintain_call
+  //1                  ,2             ,3 ,4 ,5                     ,6    ,7    ,8 ,9  ,10  ,11 ,12  ,13 ,14 ,15                ,16,17           ,18,19  ,20  ,21
+    {LbBtnT_HorizSlider, BID_WRK_SLDR1, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 216,  4, 222,132, 24, gui_worker_slider, 0, GUIStr_Empty, 0, {0}, 255, maintain_worker_slider},
+  //1                ,2                ,3 ,4 ,5    ,6    ,7    ,8 ,9  ,10  ,11 ,12  ,13 ,14 ,15                       ,16,17          ,18,19 ,20, 21
+    {LbBtnT_NormalBtn, BID_WRK_MAX_MIN1, 0, 0, NULL, NULL, NULL, 0, 85, 218, 85, 218, 60, 24, gui_area_worker_max_info, 0,GUIStr_Empty,0 ,{0}, 0, NULL},
+    /*{LbBtnT_HorizSlider, BID_WRK_SLDR2, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 236,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
+    {LbBtnT_HorizSlider, BID_WRK_SLDR3, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 256,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
+    {LbBtnT_HorizSlider, BID_WRK_SLDR4, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 276,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
+    {LbBtnT_HorizSlider, BID_WRK_SLDR5, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 296,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
+    {LbBtnT_HorizSlider, BID_WRK_SLDR6, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 316,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
+    {LbBtnT_HorizSlider, BID_WRK_SLDR7, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 336,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
+    {LbBtnT_HorizSlider, BID_WRK_SLDR8, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 356,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
+    {LbBtnT_HorizSlider, BID_WRK_SLDR9, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 276,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
+    {LbBtnT_HorizSlider, BID_WRK_SLDR10, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 396,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
+    {LbBtnT_HorizSlider, BID_WRK_SLDR11, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 416,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, maintain_worker_slider},
+    */{LbBtnT_NormalBtn,   BID_WRK_NXPG,0, 1, NULL, NULL, NULL, 0, 110, 190,  110, 190, 24, 24, gui_area_new_worker_button, GPS_crspell_dig_std_s, GUIStr_Empty, &query_menu, {0}, 0, NULL},
     {             -1, BID_DEFAULT, 0, 0, NULL, NULL, NULL, 0,  0,   0,  0,   0,  0,  0, NULL,                   0, 0,              0, {0}, 0, NULL},
 };
 
@@ -381,7 +386,7 @@ struct GuiButtonInit query_menu_buttons[] = {
   {LbBtnT_NormalBtn,    BID_DEFAULT,      0, 0, gui_toggle_ally, NULL, NULL, 0,  62, 298,  62, 298, 14, 22, gui_area_ally,                 0,                                     GUIStr_AllyWithPlayer,       0,       {1},            0, maintain_ally },
   {LbBtnT_NormalBtn,    BID_DEFAULT,      0, 0, gui_toggle_ally, NULL, NULL, 0,  62, 322,  62, 322, 14, 22, gui_area_ally,                 0,                                     GUIStr_AllyWithPlayer,       0,       {2},            0, maintain_ally },
   {LbBtnT_NormalBtn,    BID_DEFAULT,      0, 0, gui_toggle_ally, NULL, NULL, 0,  62, 346,  62, 346, 14, 22, gui_area_ally,                 0,                                     GUIStr_AllyWithPlayer,       0,       {3},            0, maintain_ally },
-  {LbBtnT_NormalBtn,    BID_WRK_NXPG,     0, 1, NULL,            NULL, NULL, 0,  110, 190,  110, 190, 24, 24, gui_area_new_worker_button,  GPS_crspell_dig_std_s,                 GUIStr_Empty,                &worker_menu, {0},       0, NULL},
+  {LbBtnT_NormalBtn,    BID_WRK_NXPG,     0, 1, NULL,            NULL, NULL, 0,  110, 190,  110, 190, 24, 24, gui_area_new_worker_button,GPS_crspell_dig_std_s,                 GUIStr_Empty,                &worker_menu, {0},       0, NULL},
   {              -1,    BID_DEFAULT,      0, 0, NULL,            NULL, NULL, 0,   0,   0,   0,   0,  0,  0, NULL,                          0,                                     0,                           0,       {0},            0, NULL },
 };
 
