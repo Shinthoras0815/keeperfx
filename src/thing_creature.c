@@ -3690,38 +3690,101 @@ void thing_fire_shot(struct Thing *firing, struct Thing *target, ThingModel shot
         shotng->shot.damage = damage;
         shotng->parent_idx = firing->index;
         break;
-    case ShFL_Hail:
+case ShFL_Hail:
+{
+    long i, j;
+    long effect_amount = shotst->effect_amount; // Total number of projectiles
+    long max_radius = 512;                     // Maximum spread radius
+    long ring_count = effect_amount / 6;       // Dynamically calculate the number of rings (minimum 1 ring)
+    if (ring_count < 1) ring_count = 1;
+    long shots_per_ring = effect_amount / ring_count; // Number of projectiles per ring
+
+    shot_set_start_pos(firing, shotst, &pos1);
+
+    // Debugging: Log basic values
+    JUSTLOG("EffectAmount: %ld, RingCount: %ld, ShotsPerRing: %ld", 
+            effect_amount, ring_count, shots_per_ring);
+
+    // Calculate offset in the firing direction
+    struct ComponentVector start_offset;
+    long forward_distance = 256; // Distance in the firing direction
+    angles_to_vector(angle_xy, 0, forward_distance, &start_offset);
+
+    // Adjust start position by adding the calculated offset
+    struct Coord3d offset_pos = pos1;
+    offset_pos.x.val += start_offset.x;
+    offset_pos.y.val += start_offset.y;
+    offset_pos.z.val += start_offset.z;
+
+    for (i = 1; i <= ring_count; i++) // Loop through the rings
     {
-        long i;
-        shot_set_start_pos(firing, shotst, &pos1);
-        for (i = 0; i < shotst->effect_amount; i++)
+        long current_radius = (max_radius * i) / ring_count; // Radius of the current ring
+        JUSTLOG("Ring %ld: Current Radius: %ld", i, current_radius);
+
+        long azimuth_offset = 1024 / (2 * shots_per_ring);
+        // Add rotation for every second ring for more randomness
+        long ring_rotation = (i % 2 == 0) ? (azimuth_offset) : 0;
+
+        for (j = 0; j < shots_per_ring; j++) // Loop through the angles
         {
-            if (shotst->speed_deviation)
-            {
-                speed = (short)(shotst->speed - (shotst->speed_deviation/2) + (CREATURE_RANDOM(firing, shotst->speed_deviation)));
+            // Calculate the azimuth angle with optional rotation for the ring
+            long azimuth_angle = ((1024 * j) / shots_per_ring) + ring_rotation;
+            azimuth_angle %= 1024; // Ensure the angle stays within 0–1024
+
+            long max_deviation = current_radius / 10; // Maximum deviation for spread
+
+            // Symmetrical polar angle calculation
+            long adjusted_angle_xy = angle_xy + ((LbCosL(azimuth_angle) * max_deviation) >> 16);
+            long adjusted_angle_z = ((LbSinL(azimuth_angle) * max_deviation) >> 16);
+
+            // Add random deviation
+            long random_azimuth_deviation = CREATURE_RANDOM(firing, 20) - 10; // Range: -10 to +10
+            long random_polar_deviation = CREATURE_RANDOM(firing, 20) - 10;   // Range: -10 to +10
+
+            adjusted_angle_xy += random_azimuth_deviation;
+            adjusted_angle_z += random_polar_deviation;
+
+            // Ensure symmetry: Invert polar angle for lower half
+            if (j % 2 == 1) {
+                adjusted_angle_z = -adjusted_angle_z;
             }
-            else
-            {
-                speed = shotst->speed;
-            }
-            tmptng = create_thing(&pos1, TCls_Shot, shot_model, firing->owner, -1);
+
+            // Debugging: Log the calculated angles
+            JUSTLOG("Ring %ld, Shot %ld: Azimuth=%ld, Adjusted XY=%ld, Adjusted Z=%ld, Random Azimuth=%ld, Random Polar=%ld", 
+                    i, j, azimuth_angle, adjusted_angle_xy, adjusted_angle_z, random_azimuth_deviation, random_polar_deviation);
+
+            // Create a new projectile
+            struct Coord3d shot_pos = offset_pos;
+
+            tmptng = create_thing(&shot_pos, TCls_Shot, shot_model, firing->owner, -1);
             if (thing_is_invalid(tmptng))
-              break;
+            {
+                JUSTLOG("Failed to create shot %ld,%ld", i, j);
+                break;
+            }
+
             shotng = tmptng;
             shotng->shot.hit_type = hit_type;
-            shotng->move_angle_xy = (short)((angle_xy + CREATURE_RANDOM(firing, 2 * shotst->spread_xy + 1) - shotst->spread_xy) & LbFPMath_AngleMask);
-            shotng->move_angle_z = (short)((angle_yz + CREATURE_RANDOM(firing, 2 * shotst->spread_z + 1) - shotst->spread_z) & LbFPMath_AngleMask);
-            angles_to_vector(shotng->move_angle_xy, shotng->move_angle_z, speed, &cvect);
+
+            // Set the projectile's direction based on calculated angles
+            angles_to_vector(adjusted_angle_xy, adjusted_angle_z, shotst->speed, &cvect);
+            JUSTLOG("Shot %ld,%ld: Adding velocity x=%d, y=%d, z=%d", 
+                    i, j, cvect.x, cvect.y, cvect.z);
             shotng->veloc_push_add.x.val += cvect.x;
             shotng->veloc_push_add.y.val += cvect.y;
             shotng->veloc_push_add.z.val += cvect.z;
+
+            // Set additional projectile properties
             shotng->state_flags |= TF1_PushAdd;
             shotng->shot.damage = damage;
             shotng->health = shotst->health;
-            shotng->parent_idx = firing->index;
+            JUSTLOG("Shot %ld,%ld: Created", i, j);
         }
-        break;
     }
+    break;
+}
+
+
     case ShFL_Volley:
         // fallthrough
     case ShFL_Lizard:
