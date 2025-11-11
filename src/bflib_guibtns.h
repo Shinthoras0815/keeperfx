@@ -54,6 +54,8 @@ enum TbButtonType {
     LbBtnT_HorizSlider,
     LbBtnT_EditBox,
     LbBtnT_Unknown6,
+    LbBtnT_RangeSlider,
+    LbBtnT_Sliderknob,
 };
 
 enum TbButtonFlags {
@@ -63,6 +65,7 @@ enum TbButtonFlags {
     LbBtnF_Enabled    =  0x08,  /**< Informs if the button is enabled and can be clicked, or disabled and grayed out with no reaction to input. */
     LbBtnF_MouseOver  =  0x10,
     LbBtnF_Unknown20  =  0x20,
+    LbBtnF_MouseDrag  =  0x40,
 };
 
 enum GBoxFlags {
@@ -72,6 +75,10 @@ enum GBoxFlags {
 
 union GuiVariant {
     long lval;
+    struct {
+        int min_val;
+        int max_val;
+    } range;
     long *lptr;
     void *ptr;
     char *str;
@@ -165,7 +172,11 @@ struct GuiButton {
        unsigned short maxval;
        struct GuiMenu *parent_menu;
        union GuiVariant content;
-       unsigned short slide_val; // slider value, scaled 0..255
+       unsigned short slide_val; // slider value, scaled 0..255 max
+       unsigned short slide_val2; // slider value, scaled 0..255 min
+       unsigned char active_slider_handle;
+       unsigned int slider_click_offset;
+       unsigned int slider_offset_initialized;
        short has_shown_before; // GUI tooltips take longer to display the next time you show them
 };
 

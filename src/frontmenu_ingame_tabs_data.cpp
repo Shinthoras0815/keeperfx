@@ -348,10 +348,11 @@ GuiButtonInit worker_menu_page_buttons[] =
 {
   //1 gbtype //2 id_num //3 unused //4 unkown flag //5 click_event //6 rclick_event //7 ptover_event //8 btype_value //9 scr_pos_x//10 scr_pos_y //11 pos_x //12 pos_y
   //13 width //14 height //15 draw_call //16 sprite_idx //17 tooltip_stridx //18 parent_menu //19 content //20 maxval //21 maintain_call
+    //1                ,2                ,3 ,4 ,5    ,6    ,7    ,8 ,9  ,10  ,11 ,12  ,13 ,14 ,15                       ,16,17          ,18,19 ,20, 21
+    {LbBtnT_NormalBtn, BID_WRK_MAX_MIN1, 0, 0, NULL, NULL, NULL, 0, 80, 218, 80, 218, 60, 24, gui_area_worker_max_info, 0,GUIStr_Empty,0 ,{0}, 0, NULL},
   //1                  ,2             ,3 ,4 ,5                     ,6    ,7    ,8 ,9  ,10  ,11 ,12  ,13 ,14 ,15                ,16,17           ,18,19  ,20  ,21
-    {LbBtnT_HorizSlider, BID_WRK_SLDR1, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 216,  4, 222,132, 24, gui_worker_slider, 0, GUIStr_Empty, 0, {0}, 255, maintain_worker_slider},
-  //1                ,2                ,3 ,4 ,5    ,6    ,7    ,8 ,9  ,10  ,11 ,12  ,13 ,14 ,15                       ,16,17          ,18,19 ,20, 21
-    {LbBtnT_NormalBtn, BID_WRK_MAX_MIN1, 0, 0, NULL, NULL, NULL, 0, 85, 218, 85, 218, 60, 24, gui_area_worker_max_info, 0,GUIStr_Empty,0 ,{0}, 0, NULL},
+    {LbBtnT_RangeSlider, BID_WRK_SLDR1, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  -1, 216,  -1, 216,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, maintain_worker_slider},
+    //{LbBtnT_Sliderknob , BID_WRK_SLDR1, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 216,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, maintain_worker_slider},
     /*{LbBtnT_HorizSlider, BID_WRK_SLDR2, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 236,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
     {LbBtnT_HorizSlider, BID_WRK_SLDR3, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 256,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},
     {LbBtnT_HorizSlider, BID_WRK_SLDR4, 0, 0, gui_set_Worker_slider, NULL, NULL, 0,  4, 276,  4, 222,132, 24, gui_area_slider, 0, GUIStr_Empty, 0, {0}, 255, NULL},

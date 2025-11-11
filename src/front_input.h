@@ -56,7 +56,7 @@ enum GameKeys {
     Gkey_ZoomRoom13,
     Gkey_ZoomRoom14,
     Gkey_ZoomRoom15, // 25
-    Gkey_ZoomToFight, 
+    Gkey_ZoomToFight,
     Gkey_ZoomCrAnnoyed,
     Gkey_CrtrContrlMod,
     Gkey_CrtrQueryMod,
@@ -99,6 +99,9 @@ struct GuiMenu;
 struct GuiButton;
 
 #pragma pack()
+
+#define RANGE_SLIDER_LEFT  1
+#define RANGE_SLIDER_RIGHT 2
 /******************************************************************************/
 extern long old_mx;
 extern long old_my;

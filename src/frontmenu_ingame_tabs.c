@@ -2087,12 +2087,15 @@ void maintain_worker_slider(struct GuiButton *gbtn)
     const int max = 11;
     int id_num = gbtn->id_num;
     int priority_index = id_num - min_id;
+    int slider_val;
 
-    // validate array index
     if(priority_index >= 0 && priority_index < max){
-        int slider_val = make_audio_slider_linear(dungeon->worker_task_max_count[priority_index]);
-        get_gui_button_init((get_active_menu(gbtn->gmenu_idx)), id_num)->content.lval = slider_val;
+        slider_val = make_audio_slider_linear(dungeon->worker_task_max_count[priority_index]);
+        get_gui_button_init((get_active_menu(gbtn->gmenu_idx)), id_num)->content.range.max_val = slider_val;
         gbtn->slide_val = slider_val;
+        slider_val = make_audio_slider_linear(dungeon->worker_task_min_count[priority_index]);
+        get_gui_button_init((get_active_menu(gbtn->gmenu_idx)), id_num)->content.range.min_val = slider_val;
+        gbtn->slide_val2 = slider_val;
     }
 }
 

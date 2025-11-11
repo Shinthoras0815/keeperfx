@@ -37,6 +37,8 @@ int guibutton_get_unused_slot(void);
 void gui_clear_buttons_not_over_mouse(int gmbtn_idx);
 TbBool gui_button_release_inputs(int gmbtn_idx);
 TbBool gui_slider_button_inputs(int gbtn_idx);
+TbBool gui_range_slider_button_inputs(int gbtn_idx);
+TbBool gui_range_slider_button_mouse_over_slider_tracker(int gbtn_idx);
 TbBool gui_slider_button_mouse_over_slider_tracker(int gbtn_idx);
 TbBool gui_button_click_inputs(int gmbtn_idx);
 void fake_button_click(int gmbtn_idx);

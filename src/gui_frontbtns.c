@@ -122,32 +122,202 @@ TbBool gui_slider_button_inputs(int gbtn_idx)
     if (gbtn_idx < 0)
       return false;
     gbtn = &active_buttons[gbtn_idx];
+    if(gbtn->active_slider_handle == 0)
+        return false;
     mouse_x = GetMouseX();
     gbtn->gbactn_1 = 1;
     int bs_units_per_px;
+
     bs_units_per_px = simple_button_sprite_height_units_per_px(gbtn, GBS_frontend_button_std_c, 44);
-    slide_start = gbtn->pos_x + 32*bs_units_per_px/16;
-    slide_end = gbtn->pos_x + gbtn->width - 32*bs_units_per_px/16;
-    if (mouse_x < slide_start)
+    slide_start = gbtn->pos_x + 16*bs_units_per_px/16;
+    slide_end = gbtn->pos_x + gbtn->width - 16*bs_units_per_px/16;
+    int effective_width = slide_end - slide_start;
+    if (effective_width < 2) effective_width = 2; // avoid div by zero
+
+    // Use (effective_width-1) so 255 maps to the rightmost pixel
+    int new_val = ((mouse_x - slide_start) * 255) / (effective_width - 1);
+    if (new_val < 0) new_val = 0;
+    if (new_val > 255) new_val = 255;
+
+    if(gbtn->active_slider_handle == RANGE_SLIDER_RIGHT)
     {
-        gbtn->slide_val = 0;
-    } else
-    if (mouse_x >= slide_end)
-    {
-        gbtn->slide_val = 255;
-    } else
-    if (gbtn->width > 64*bs_units_per_px/16)
-    {
-        gbtn->slide_val = ((mouse_x-slide_start) << 8) / (gbtn->width-64*bs_units_per_px/16);
-    } else
-    {
-        gbtn->slide_val = ((mouse_x-gbtn->pos_x) << 8) / (gbtn->width+1);
+        // Max knob: cannot go below min knob (but can be equal)
+        if (new_val < gbtn->slide_val2) new_val = gbtn->slide_val2;
+        gbtn->slide_val = new_val;
     }
-    gbtn->content.lval = (gbtn->slide_val) * (((long)gbtn->maxval)+1) >> 8;
+    else if(gbtn->active_slider_handle == RANGE_SLIDER_LEFT)
+    {
+        // Min knob: cannot go above max knob (but can be equal)
+        if (new_val > gbtn->slide_val) new_val = gbtn->slide_val;
+        gbtn->slide_val2 = new_val;
+    }
+
     callback = gbtn->click_event;
     if (callback != NULL)
       callback(gbtn);
     return true;
+}
+
+// Improved: only select a knob if the mouse is within its hitbox
+// If the knobs overlap, split the hitbox: left half for left knob, right half for right knob
+TbBool gui_range_slider_button_inputs(int gbtn_idx)
+{
+    Gf_Btn_Callback callback;
+    int mouse_x;
+    struct GuiButton *gbtn;
+    if (gbtn_idx < 0)
+      return false;
+    gbtn = &active_buttons[gbtn_idx];
+    if(gbtn->active_slider_handle == 0)
+        return false;
+    mouse_x = GetMouseX();
+    gbtn->gbactn_1 = 1;
+    int bs_units_per_px = simple_button_sprite_height_units_per_px(gbtn, GBS_frontend_button_std_c, 44);
+    float margin_frac = 0.1f;
+    int bar_left = gbtn->pos_x + 16*bs_units_per_px/16;
+    int bar_right = gbtn->pos_x + gbtn->width - 16*bs_units_per_px/16;
+    int bar_width = bar_right - bar_left;
+    int knob_margin = (int)(bar_width * margin_frac);
+    int knob_range_left = bar_left + knob_margin;
+    int knob_range_right = bar_right - knob_margin;
+    int knob_range_width = knob_range_right - knob_range_left;
+
+    int new_val;
+    if (gbtn->slider_offset_initialized) {
+        // Use offset so knob stays under mouse
+        int knob_center = mouse_x - gbtn->slider_click_offset;
+        new_val = ((knob_center - knob_range_left) * 255) / knob_range_width;
+    } else {
+        // fallback (should not happen)
+        new_val = ((mouse_x - knob_range_left) * 255) / knob_range_width;
+    }
+    if (new_val < 0) new_val = 0;
+    if (new_val > 255) new_val = 255;
+
+    if(gbtn->active_slider_handle == RANGE_SLIDER_RIGHT)
+    {
+        if (new_val < gbtn->slide_val2) new_val = gbtn->slide_val2;
+        gbtn->slide_val = new_val;
+    }
+    else if(gbtn->active_slider_handle == RANGE_SLIDER_LEFT)
+    {
+        if (new_val > gbtn->slide_val) new_val = gbtn->slide_val;
+        gbtn->slide_val2 = new_val;
+    }
+
+    callback = gbtn->click_event;
+    if (callback != NULL)
+      callback(gbtn);
+    return true;
+}
+
+TbBool gui_range_slider_button_mouse_over_slider_tracker(int gbtn_idx)
+{
+    struct GuiButton *gbtn;
+    if (gbtn_idx < 0)
+        return false;
+    gbtn = &active_buttons[gbtn_idx];
+    if (gbtn->gbtype != LbBtnT_RangeSlider)
+        return false;
+
+    int bs_units_per_px = gbtn->height * 16 / 22;
+    int hitbox_half_width = 14 * bs_units_per_px / 16;
+    int mouse_x = GetMouseX();
+    int mouse_y = GetMouseY();
+    float margin_frac = 0.1f;
+    int bar_left = gbtn->pos_x + 16 * bs_units_per_px / 16;
+    int bar_right = gbtn->pos_x + gbtn->width - 16 * bs_units_per_px / 16;
+    int bar_width = bar_right - bar_left;
+    int knob_margin = (int)(bar_width * margin_frac);
+    int knob_range_left = bar_left + knob_margin;
+    int knob_range_right = bar_right - knob_margin;
+    int knob_range_width = knob_range_right - knob_range_left;
+    int slider_pos_x = knob_range_left + ((gbtn->slide_val * knob_range_width) / 255);
+    int slider2_pos_x = knob_range_left + ((gbtn->slide_val2 * knob_range_width) / 255);
+
+    // Only check if mouse is within the button's vertical bounds
+    if ((mouse_y < gbtn->pos_y) || (mouse_y > gbtn->pos_y + gbtn->height)) {
+        if (!lbDisplay.MLeftButton) {
+            gbtn->active_slider_handle = 0;
+            gbtn->slider_offset_initialized = 0;
+        }
+        return false;
+    }
+
+    // While dragging, only the active knob's hitbox is enabled, the other is shrunk to 0
+    if (gbtn->active_slider_handle != 0 && lbDisplay.MLeftButton) {
+        int grow = hitbox_half_width * 2;
+        if (gbtn->active_slider_handle == RANGE_SLIDER_LEFT) {
+            // hitbox for right knob = 0
+            if (mouse_x >= slider2_pos_x - grow && mouse_x <= slider2_pos_x + grow) {
+                return true;
+            }
+        } else if (gbtn->active_slider_handle == RANGE_SLIDER_RIGHT) {
+            // hitbox for left knob = 0
+            if (mouse_x >= slider_pos_x - grow && mouse_x <= slider_pos_x + grow) {
+                return true;
+            }
+        }
+        // If mouse leaves the knob while dragging, stop dragging
+        gbtn->active_slider_handle = 0;
+        gbtn->slider_offset_initialized = 0;
+        return false;
+    }
+
+    // Only allow knob selection if not already dragging
+    if (!lbDisplay.MLeftButton || gbtn->active_slider_handle == 0) {
+        int left_min = slider2_pos_x - hitbox_half_width;
+        int left_max = slider2_pos_x + hitbox_half_width;
+        int right_min = slider_pos_x - hitbox_half_width;
+        int right_max = slider_pos_x + hitbox_half_width;
+
+        // If hitboxes overlap, split the overlap
+        int overlap_min = (left_min > right_min) ? left_min : right_min;
+        int overlap_max = (left_max < right_max) ? left_max : right_max;
+        TbBool overlap = (overlap_min <= overlap_max);
+
+        if (overlap) {
+            int overlap_center = (overlap_min + overlap_max) / 2;
+            if (mouse_x >= overlap_min && mouse_x <= overlap_max) {
+                if (mouse_x < overlap_center) {
+                    gbtn->active_slider_handle = RANGE_SLIDER_LEFT;
+                } else {
+                    gbtn->active_slider_handle = RANGE_SLIDER_RIGHT;
+                }
+                // Store offset on click
+                if (left_button_clicked && !gbtn->slider_offset_initialized) {
+                    int knob_center = (gbtn->active_slider_handle == RANGE_SLIDER_LEFT) ? slider2_pos_x : slider_pos_x;
+                    gbtn->slider_click_offset = mouse_x - knob_center;
+                    gbtn->slider_offset_initialized = 1;
+                }
+                return true;
+            }
+        }
+        // If not in overlap, check normal hitboxes
+        if ((mouse_x >= left_min) && (mouse_x <= left_max)) {
+            gbtn->active_slider_handle = RANGE_SLIDER_LEFT;
+            if (left_button_clicked && !gbtn->slider_offset_initialized) {
+                gbtn->slider_click_offset = mouse_x - slider2_pos_x;
+                gbtn->slider_offset_initialized = 1;
+            }
+            return true;
+        }
+        if ((mouse_x >= right_min) && (mouse_x <= right_max)) {
+            gbtn->active_slider_handle = RANGE_SLIDER_RIGHT;
+            if (left_button_clicked && !gbtn->slider_offset_initialized) {
+                gbtn->slider_click_offset = mouse_x - slider_pos_x;
+                gbtn->slider_offset_initialized = 1;
+            }
+            return true;
+        }
+    }
+
+    // If not dragging and not over a knob, reset
+    if (!lbDisplay.MLeftButton) {
+        gbtn->active_slider_handle = 0;
+        gbtn->slider_offset_initialized = 0;
+    }
+    return false;
 }
 
 TbBool gui_slider_button_mouse_over_slider_tracker(int gbtn_idx)
@@ -156,6 +326,8 @@ TbBool gui_slider_button_mouse_over_slider_tracker(int gbtn_idx)
     if (gbtn_idx < 0)
       return false;
     gbtn = &active_buttons[gbtn_idx];
+    if(gbtn->gbtype != LbBtnT_HorizSlider)
+        return false;
     int bs_units_per_px;
     bs_units_per_px = gbtn->height * 16 / 22;
     int slider_pos_x;
@@ -544,10 +716,10 @@ void gui_area_new_worker_button(struct GuiButton *gbtn)
 
 void gui_set_Worker_slider(struct GuiButton *gbtn)
 {
-    const int new_val = make_audio_slider_nonlinear(gbtn->slide_val);
+    const int new_max_val = make_audio_slider_nonlinear(gbtn->slide_val);
+    const int new_min_val = make_audio_slider_nonlinear(gbtn->slide_val2);
     struct PlayerInfo* player = get_my_player();
     struct Dungeon* dungeon = get_players_dungeon(player);
-
     const short base_id = BID_WRK_SLDR1; //BID_WRK_SLDR1
     const char max = 11; //BID_WRK_SLDR11
 
@@ -556,7 +728,9 @@ void gui_set_Worker_slider(struct GuiButton *gbtn)
 
     // validate array index
     if(priority_index >= 0 && priority_index < max){
-        dungeon->worker_task_max_count[priority_index] = new_val;
+        dungeon->worker_task_max_count[priority_index] = new_max_val;
+        dungeon->worker_task_min_count[priority_index] = new_min_val;
+        do_sound_menu_click();
     }
 }
 

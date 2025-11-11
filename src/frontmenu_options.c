@@ -31,6 +31,7 @@
 #include "gui_draw.h"
 #include "config_strings.h"
 #include "gui_frontbtns.h"
+#include "math.h"
 #include "music_player.h"
 #include "frontend.h"
 #include "front_input.h"
@@ -295,14 +296,14 @@ int make_audio_slider_linear(int a)
     // slider has a range of 0..255
     float scaled = fastPow(a / 255.0, 0.5);
     float clamped = max(min(scaled, 1.0), 0.0);
-    return CEILING(LbLerp(0, 255, clamped));
+    return (int)roundf(LbLerp(0, 255, clamped));
 }
 int make_audio_slider_nonlinear(int a)
 {
     // slider has a range of 0..255
     float scaled = fastPow(a / 255.0, 2.00);
     float clamped = max(min(scaled, 1.0), 0.0);
-    return CEILING(LbLerp(0, 255, clamped));
+    return (int)roundf(LbLerp(0, 255, clamped));
 }
 
 void gui_set_sound_volume(struct GuiButton *gbtn)

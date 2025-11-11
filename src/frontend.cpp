@@ -1102,9 +1102,10 @@ void gui_quit_game(struct GuiButton *gbtn)
     set_players_packet_action(player, PckA_Unknown001, 0, 0, 0, 0);
 }
 
-void draw_slider64k(long scr_x, long scr_y, int units_per_px, long width)
+void draw_slider64k(long scr_x, long scr_y, int units_per_px, long width, unsigned char typ)
 {
-    draw_bar64k(scr_x, scr_y, units_per_px, width);
+    if(typ != LbBtnT_RangeSlider)
+        draw_bar64k(scr_x, scr_y, units_per_px, width);
     // Inner size
     ScreenCoord x = scr_x;
     ScreenCoord y = scr_y;
@@ -1153,17 +1154,52 @@ void gui_area_slider(struct GuiButton *gbtn)
     {
         bar_width += 32;
     }
-    draw_slider64k(gbtn->scr_pos_x, gbtn->scr_pos_y, bs_units_per_px, bar_width);
+    draw_slider64k(gbtn->scr_pos_x, gbtn->scr_pos_y, bs_units_per_px, bar_width, gbtn->gbtype);
     int shift_x = (gbtn->width - 64*units_per_px/16) * gbtn->slide_val >> 8;
     const struct TbSprite *spr;
-    if (gbtn->flags != 0) {
-        spr = get_button_sprite(GBS_guisymbols_jewel_on);
-    } else {
-        spr = get_button_sprite(GBS_guisymbols_jewel_off);
-    }
-    LbSpriteDrawResized(gbtn->scr_pos_x + shift_x + 24*units_per_px/16, gbtn->scr_pos_y + 6*units_per_px/16, bs_units_per_px, spr);
-}
+        if (gbtn->flags != 0) {
+            spr = get_button_sprite(GBS_guisymbols_jewel_on);
+        } else {
+            spr = get_button_sprite(GBS_guisymbols_jewel_off);
+        }
+        if(gbtn->gbtype != LbBtnT_RangeSlider)
+        {
+            LbSpriteDrawResized(gbtn->scr_pos_x + shift_x + 24*units_per_px/16, gbtn->scr_pos_y + 6*units_per_px/16, bs_units_per_px, spr);
 
+        } else {
+// --- Range slider with scaled knob travel ---
+            float margin_frac = 0.1f; // 10% margin on each side
+            int bar_left = gbtn->scr_pos_x + 16*units_per_px/16;
+            int bar_right = gbtn->scr_pos_x + gbtn->width - 16*units_per_px/16;
+            int inner_bar_width = bar_right - bar_left;
+            int knob_margin = (int)(inner_bar_width * margin_frac);
+            int knob_range_left = bar_left + knob_margin;
+            int knob_range_right = bar_right - knob_margin;
+            int knob_range_width = knob_range_right - knob_range_left;
+
+            // Get knob sprite and size
+            if (gbtn->flags != 0) {
+                spr = get_button_sprite(GBS_guisymbols_jewel_on);
+            } else {
+                spr = get_button_sprite(GBS_guisymbols_jewel_off);
+            }
+            int knob_half_w = (spr->SWidth * bs_units_per_px) / 32 / 2;
+                        int knob_scale = bs_units_per_px * 3 / 4; // 75% of original size
+
+            // Draw right (max) knob
+            int knob_val = gbtn->slide_val;
+            int knob_center = knob_range_left + ((knob_val * knob_range_width) / 255);
+            int knob_draw_x = knob_center - knob_half_w;
+            LbSpriteDrawResized(knob_draw_x, gbtn->scr_pos_y + 6*units_per_px/16, knob_scale, spr);
+
+            // Draw left (min) knob
+            knob_val = gbtn->slide_val2;
+            knob_center = knob_range_left + ((knob_val * knob_range_width) / 255);
+            knob_draw_x = knob_center - knob_half_w;
+            LbSpriteDrawResized(knob_draw_x, gbtn->scr_pos_y + 6*units_per_px/16, knob_scale, spr);
+        }
+}
+/*
 void draw_workerslider64k(long scr_x, long scr_y, int units_per_px, long width)
 {
     // Inner size
@@ -1190,29 +1226,28 @@ void draw_workerslider64k(long scr_x, long scr_y, int units_per_px, long width)
     LbSpriteDrawResized(cur_x, cur_y, units_per_px, spr);
     cur_x += spr->SWidth*units_per_px/16;
     spr = get_button_sprite(GBS_borders_bar_std_c);
-    while (cur_x < end_x)
-    {
-        LbSpriteDrawResized(cur_x, cur_y, units_per_px, spr);
+            LbSpriteDrawResized(cur_x, cur_y, units_per_px, spr);
         cur_x += spr->SWidth*units_per_px/16;
+        spr = get_button_sprite(GBS_borders_bar_std_r);
+    LbSpriteDrawResized(cur_x, cur_y, units_per_px, spr);
+    int val;
+    val = gbtn->slide_val * (gbtn->width - 64*fs_units_per_px/16) >> 8;
+    if (gbtn->gbactn_1 != 0) {
+        spr = get_frontend_sprite(GFS_slider_indicator_act);
+    } else {
+        spr = get_frontend_sprite(GFS_slider_indicator_std);
     }
-    cur_x = end_x;
-    LbSpriteDrawResized(cur_x/pixel_size, cur_y/pixel_size, units_per_px, spr);
-    cur_x += spr->SWidth*units_per_px/16;
-    spr = get_button_sprite(GBS_borders_bar_std_r);
-    LbSpriteDrawResized(cur_x/pixel_size, cur_y/pixel_size, units_per_px, spr);
+    LbSpriteDrawResized((gbtn->scr_pos_x + val + 24*fs_units_per_px/16) / pixel_size, (gbtn->scr_pos_y + 3*fs_units_per_px/16) / pixel_size, fs_units_per_px, spr);
 }
-
+*/
 void gui_area_worker_max_info(struct GuiButton *gbtn)
 {
     struct PlayerInfo* player = get_my_player();
     struct Dungeon* dungeon = get_players_dungeon(player);
-
     const int min_id = BID_WRK_MAX_MIN1;
     const int max = 11;
     int id_num = gbtn->id_num;
     int priority_index = id_num - min_id;
-
-
 
     // validate array index
     if(priority_index >= 0 && priority_index < max){
@@ -1240,10 +1275,15 @@ void gui_area_worker_max_info(struct GuiButton *gbtn)
         int base_w = 17;
         draw_string64k(draw_x +4,draw_y -3, base_w,min_count);
     }
+        dungeon = get_players_dungeon(get_my_player());
 }
-
+/*
 void gui_worker_slider(struct GuiButton *gbtn)
 {
+                      struct Dungeon* dungeon = get_players_dungeon(get_my_player());
+        JUSTLOG("old worker_task_min_count[%d]", dungeon->worker_task_min_count[gbtn->id_num - BID_WRK_SLDR1]);
+        JUSTLOG("old worker_task_max_count[%d]", dungeon->worker_task_max_count[gbtn->id_num - BID_WRK_SLDR1]);
+        JUSTLOG("old Button active_slider_handle %d",  gbtn->active_slider_handle );
     if ((gbtn->flags & LbBtnF_Enabled) == 0) {
         return;
     }
@@ -1255,18 +1295,24 @@ void gui_worker_slider(struct GuiButton *gbtn)
         bar_width += 32;
     }
     draw_workerslider64k(gbtn->scr_pos_x, gbtn->scr_pos_y, bs_units_per_px, bar_width);
-    int shift_x = (gbtn->width - 64*units_per_px/16) * gbtn->slide_val >> 8;
     const struct TbSprite *spr;
-    if (gbtn->flags != 0) {
+    // draw max knobble (slide_val)
+    int shift_x = (gbtn->width - 64*units_per_px/16) * gbtn->slide_val >> 8;
         spr = get_button_sprite(GBS_guisymbols_jewel_on);
-    } else {
         spr = get_button_sprite(GBS_guisymbols_jewel_off);
-    }
     LbSpriteDrawResized(gbtn->scr_pos_x + shift_x + 24*units_per_px/16, gbtn->scr_pos_y + 6*units_per_px/16+6, bs_units_per_px/2, spr);
-
+    // draw min knobble (slide_val2)
+    shift_x = (gbtn->width - 64*units_per_px/16) * gbtn->slide_val2 >> 8;
+        spr = get_button_sprite(GBS_guisymbols_jewel_on);
+        spr = get_button_sprite(GBS_guisymbols_jewel_off);
+    LbSpriteDrawResized(gbtn->scr_pos_x + shift_x + 24*units_per_px/16, gbtn->scr_pos_y + 6*units_per_px/16+6, bs_units_per_px/2, spr);
     gui_area_worker_max_info(gbtn);
+                  dungeon = get_players_dungeon(get_my_player());
+        JUSTLOG("new worker_task_min_count[%d]", dungeon->worker_task_min_count[gbtn->id_num - BID_WRK_SLDR1]);
+        JUSTLOG("new worker_task_max_count[%d]", dungeon->worker_task_max_count[gbtn->id_num - BID_WRK_SLDR1]);
+        JUSTLOG("new Button active_slider_handle %d",  gbtn->active_slider_handle );
 }
-
+*/
 #if (BFDEBUG_LEVEL > 0)
 // Code for font testing screen (debug version only)
 TbBool fronttestfont_draw(void)
@@ -2926,7 +2972,7 @@ FrontendMenuState frontend_setup_state(FrontendMenuState nstate)
           LbTextSetWindow(0, 0, lbDisplay.PhysicalScreenWidth, lbDisplay.PhysicalScreenHeight);
           lbDisplay.DrawFlags = Lb_TEXT_HALIGN_CENTER;
           break;
-      case FeSt_LEVEL_STATS:
+            case FeSt_LEVEL_STATS:
           turn_on_menu(GMnu_FESTATISTICS);
           frontstats_set_timer();
           set_pointer_graphic_menu();
@@ -3246,7 +3292,7 @@ void draw_menu_buttons(struct GuiMenu *gmnu)
         callback = gbtn->draw_call;
         if ((callback != NULL) && (gbtn->flags & LbBtnF_Visible) && (gbtn->flags & LbBtnF_Active) && (gbtn->gmenu_idx == gmnu->number))
         {
-          if ( ((gbtn->gbactn_1 == 0) && (gbtn->gbactn_2 == 0)) || (gbtn->gbtype == LbBtnT_HorizSlider) || (callback == gui_area_null) )
+          if ( ((gbtn->gbactn_1 == 0) && (gbtn->gbactn_2 == 0)) || (gbtn->gbtype == LbBtnT_HorizSlider) ||(gbtn->gbtype == LbBtnT_RangeSlider) || (callback == gui_area_null) )
             callback(gbtn);
         }
     }
@@ -3257,7 +3303,7 @@ void draw_menu_buttons(struct GuiMenu *gmnu)
         callback = gbtn->draw_call;
         if ((callback != NULL) && (gbtn->flags & LbBtnF_Visible) && (gbtn->flags & LbBtnF_Active) && (gbtn->gmenu_idx == gmnu->number))
         {
-          if (((gbtn->gbactn_1) || (gbtn->gbactn_2)) && (gbtn->gbtype != LbBtnT_HorizSlider) && (callback != gui_area_null))
+          if (((gbtn->gbactn_1) || (gbtn->gbactn_2)) && (gbtn->gbtype != LbBtnT_HorizSlider) && (gbtn->gbtype != LbBtnT_RangeSlider) && (callback != gui_area_null))
             callback(gbtn);
         }
     }

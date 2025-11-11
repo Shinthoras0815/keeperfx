@@ -221,7 +221,7 @@ int is_game_key_pressed(long key_id, long *val, TbBool ignore_mods)
       return 0;
     }
   }
-  if ((key_id == Gkey_RotateMod) || (key_id == Gkey_SpeedMod) || (key_id == Gkey_CrtrContrlMod) 
+  if ((key_id == Gkey_RotateMod) || (key_id == Gkey_SpeedMod) || (key_id == Gkey_CrtrContrlMod)
       || (key_id == Gkey_CrtrQueryMod) || (key_id == Gkey_BestRoomSpace) || (key_id == Gkey_SquareRoomSpace)
       || (key_id == Gkey_SellTrapOnSubtile))
   {
@@ -313,7 +313,7 @@ short get_screen_capture_inputs(void)
  */
 TbBool check_if_mouse_is_over_button(const struct GuiButton *gbtn)
 {
-    if ((gbtn->flags & LbBtnF_Visible) == 0)
+    if (((gbtn->flags & LbBtnF_Visible) == 0)  )
         return false;
     return check_if_pos_is_over_button(gbtn, GetMouseX(), GetMouseY());
 }
@@ -2424,7 +2424,7 @@ TbBool get_packet_load_demo_inputs(void)
 }
 
 void get_creature_control_nonaction_inputs(void)
-{ 
+{
     struct PlayerInfo* player = get_my_player();
     if ((player->allocflags & PlaF_Unknown8) != 0)
     {
@@ -2436,7 +2436,7 @@ void get_creature_control_nonaction_inputs(void)
     struct Thing* thing = thing_get(player->controlled_thing_idx);
     TRACE_THING(thing);
     TbBool cheat_menu_active = cheat_menu_is_active();
-    if (((MyScreenWidth >> 1) != x) || ((MyScreenHeight >> 1) != y)) 
+    if (((MyScreenWidth >> 1) != x) || ((MyScreenHeight >> 1) != y))
     {
         if (!cheat_menu_active && !a_menu_window_is_active())
         {
@@ -2511,9 +2511,9 @@ void get_creature_control_nonaction_inputs(void)
         clear_key_pressed(KC_ESCAPE);
         if (a_menu_window_is_active())
         {
-            turn_off_all_window_menus();
+                        turn_off_all_window_menus();
         }
-        else
+else
         {
             if (menu_is_active(GMnu_MAIN))
             {
@@ -2521,7 +2521,9 @@ void get_creature_control_nonaction_inputs(void)
             }
             turn_on_menu(GMnu_OPTIONS);
         }
+
     }
+
 }
 
 static void speech_pickup_of_gui_job(int job_idx)
@@ -2795,6 +2797,49 @@ void input(void)
     SYNCDBG(7,"Finished");
 }
 
+// Berechnet die Hitboxen für den linken und rechten Regler des RangeSliders
+TbBool check_if_mouse_is_over_rangeslider(const struct GuiButton *gbtn)
+{
+    if ((((gbtn->flags & LbBtnF_Visible) == 0) || (gbtn->gbtype != LbBtnT_RangeSlider)))
+        return false;
+
+    int bs_units_per_px = gbtn->height * 16 / 22;
+    float margin_frac = 0.1f; // 10% margin on each side, must match drawing
+    int bar_left = gbtn->pos_x + 16*bs_units_per_px/16;
+    int bar_right = gbtn->pos_x + gbtn->width - 16*bs_units_per_px/16;
+    int bar_width = bar_right - bar_left;
+    int knob_margin = (int)(bar_width * margin_frac);
+    int knob_range_left = bar_left + knob_margin;
+    int knob_range_right = bar_right - knob_margin;
+    int knob_range_width = knob_range_right - knob_range_left;
+
+    // Calculate knob positions in the scaled range
+    int left_slider_pos = knob_range_left + ((gbtn->slide_val2 * knob_range_width) / 255);
+    int right_slider_pos = knob_range_left + ((gbtn->slide_val * knob_range_width) / 255);
+
+    int mouse_x = GetMouseX();
+    int mouse_y = GetMouseY();
+
+    // Hitbox size matches reduced knob size (75%)
+    int hitbox_half_width = (14 * bs_units_per_px / 16) * 3 / 4;
+
+    // Check left knob
+    if ((mouse_x >= left_slider_pos - hitbox_half_width) &&
+        (mouse_x <= left_slider_pos + hitbox_half_width) &&
+        (mouse_y >= gbtn->pos_y) && (mouse_y < gbtn->pos_y + gbtn->height))
+    {
+        return true;
+    }
+    // Check right knob
+    if ((mouse_x >= right_slider_pos - hitbox_half_width) &&
+        (mouse_x <= right_slider_pos + hitbox_half_width) &&
+        (mouse_y >= gbtn->pos_y) && (mouse_y < gbtn->pos_y + gbtn->height))
+    {
+        return true;
+    }
+    return false;
+}
+
 short get_gui_inputs(short gameplay_on)
 {
   static ActiveButtonID over_slider_button = -1;
@@ -2841,7 +2886,8 @@ short get_gui_inputs(short gameplay_on)
       // TODO GUI Introduce circular buttons instead of specific condition for pannel map
       if ((menu_id_to_number(GMnu_MAIN) >= 0) && mouse_is_over_panel_map(player->minimap_pos_x,player->minimap_pos_y))
           continue;
-      if ( (check_if_mouse_is_over_button(gbtn) && !game_is_busy_doing_gui_string_input())
+          // deactivated
+      if ( ((check_if_mouse_is_over_button(gbtn) || check_if_mouse_is_over_rangeslider(gbtn)) && !game_is_busy_doing_gui_string_input())
         || ((gbtn->gbtype == LbBtnT_Unknown6) && (gbtn->gbactn_1 != 0)) )
       {
           if ((fmmenu_idx == -1) || (gbtn->gmenu_idx == fmmenu_idx))
@@ -2854,7 +2900,7 @@ short get_gui_inputs(short gameplay_on)
                 callback(gbtn);
             if (gbtn->gbtype == LbBtnT_Unknown6)
                 break;
-            if (gbtn->gbtype == LbBtnT_HorizSlider)
+            if (gbtn->gbtype == LbBtnT_HorizSlider || gbtn->gbtype == LbBtnT_RangeSlider)
                 nx_over_slider_button = gidx;
           } else
           {
@@ -2864,9 +2910,10 @@ short get_gui_inputs(short gameplay_on)
       {
           gbtn->flags &= ~LbBtnF_MouseOver;
       }
-      if (gbtn->gbtype == LbBtnT_HorizSlider)
+
+      if (gbtn->gbtype == LbBtnT_HorizSlider || gbtn->gbtype == LbBtnT_RangeSlider)
       {
-          if (gui_slider_button_mouse_over_slider_tracker(gidx))
+          if (gui_slider_button_mouse_over_slider_tracker(gidx) || gui_range_slider_button_mouse_over_slider_tracker(gidx))
           {
               if ( left_button_clicked )
               {
@@ -2902,8 +2949,16 @@ short get_gui_inputs(short gameplay_on)
   }
   clear_flag(tool_tip_box.flags, TTip_Visible);
   gui_button_tooltip_update(gmbtn_idx);
+if((&active_buttons[gmbtn_idx])->gbtype == LbBtnT_HorizSlider)
+{
   if (gui_slider_button_inputs(over_slider_button))
-      return true;
+    return true;
+}else
+if((&active_buttons[gmbtn_idx])->gbtype == LbBtnT_RangeSlider)
+{
+  if (gui_range_slider_button_inputs(over_slider_button))
+    return true;
+}
   result |= gui_button_click_inputs(gmbtn_idx);
   gui_clear_buttons_not_over_mouse(gmbtn_idx);
   result |= gui_button_release_inputs(gmbtn_idx);
@@ -2911,6 +2966,60 @@ short get_gui_inputs(short gameplay_on)
   SYNCDBG(8,"Finished");
   return result;
 }
+
+/*
+      if (gbtn->gbtype != LbBtnT_RangeSlider)
+      {
+        if ( (check_if_mouse_is_over_button(gbtn) && !game_is_busy_doing_gui_string_input())
+        || ((gbtn->gbtype == LbBtnT_Unknown6) && (gbtn->gbactn_1 != 0)) )
+        {
+            if ((fmmenu_idx == -1) || (gbtn->gmenu_idx == fmmenu_idx))
+            {
+                gmbtn_idx = gidx;
+                gbtn->flags |= LbBtnF_MouseOver;
+                busy_doing_gui = 1;
+                callback = gbtn->ptover_event;
+                if (callback != NULL)
+                    callback(gbtn);
+                if (gbtn->gbtype == LbBtnT_Unknown6)
+                    break;
+                if (gbtn->gbtype == LbBtnT_HorizSlider || gbtn->gbtype == LbBtnT_RangeSlider)
+                    nx_over_slider_button = gidx;
+            } else
+            {
+                gbtn->flags &= ~LbBtnF_MouseOver;
+            }
+        } else
+        {
+            gbtn->flags &= ~LbBtnF_MouseOver;
+        }
+      } else
+      {
+        if ( (check_if_mouse_is_over_rangeslider(gbtn) && !game_is_busy_doing_gui_string_input())
+        || ((gbtn->gbtype == LbBtnT_Unknown6) && (gbtn->gbactn_1 != 0)) )
+        {
+            if ((fmmenu_idx == -1) || (gbtn->gmenu_idx == fmmenu_idx))
+            {
+                gmbtn_idx = gidx;
+                gbtn->flags |= LbBtnF_MouseOver;
+                busy_doing_gui = 1;
+                callback = gbtn->ptover_event;
+                if (callback != NULL)
+                    callback(gbtn);
+                if (gbtn->gbtype == LbBtnT_Unknown6)
+                    break;
+                if (gbtn->gbtype == LbBtnT_HorizSlider || gbtn->gbtype == LbBtnT_RangeSlider)
+                    nx_over_slider_button = gidx;
+            } else
+            {
+                gbtn->flags &= ~LbBtnF_MouseOver;
+            }
+        } else
+        {
+            gbtn->flags &= ~LbBtnF_MouseOver;
+        }
+      }
+*/
 
 void process_cheat_mode_selection_inputs()
 {
@@ -3122,7 +3231,7 @@ void process_cheat_mode_selection_inputs()
                            if (new_value == 0)
                            {
                                break;
-                           }                           
+                           }
                         }
                         crconf = &game.conf.crtr_conf.model[new_value];
                     }
@@ -3292,7 +3401,7 @@ TbBool process_cheat_heart_health_inputs(HitPoints *value, HitPoints max_health)
    HitPoints new_health = *value;
    if ( (is_key_pressed(KC_ADD, KMod_ALT)) || (is_key_pressed(KC_EQUALS, KMod_SHIFT)) || (is_key_pressed(KC_EQUALS, KMod_NONE)) )
    {
-        if (new_health < max_health) 
+        if (new_health < max_health)
         {
             new_health++;
             *value = new_health;
