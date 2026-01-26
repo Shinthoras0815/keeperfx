@@ -1008,11 +1008,16 @@ TbBool explosion_affecting_thing(struct Thing *tngsrc, struct Thing *tngdst, con
             if (tngdst->class_id == TCls_Creature)
             {
                 struct Thing* origtng = get_parent_thing(tngsrc);
+                struct Thing* damage_source = origtng;
+                if (thing_is_invalid(damage_source) && (tngsrc->class_id != TCls_Shot))
+                {
+                    damage_source = tngsrc;
+                }
                 if (max_damage > 0)
                 {
                     HitPoints damage = get_radially_decaying_value(max_damage, max_dist / 4, 3 * max_dist / 4, distance) + 1;
                     SYNCDBG(7,"Causing %d damage to %s at distance %d",(int)damage,thing_model_name(tngdst),(int)distance);
-                    apply_damage_to_thing_and_display_health(tngdst, damage, owner);
+                    apply_damage_to_thing_and_display_health(tngdst, damage, owner, damage_source);
                     if (flag_is_set(shotst->model_flags,ShMF_LifeDrain))
                     {
                         give_shooter_drained_health(origtng, damage / 2);
@@ -1038,7 +1043,7 @@ TbBool explosion_affecting_thing(struct Thing *tngsrc, struct Thing *tngdst, con
                     {
                         spell_level = scctrl->exp_level;
                     }
-                    apply_spell_effect_to_thing(tngdst, shotst->cast_spell_kind, spell_level, owner);
+                    apply_spell_effect_to_thing(tngdst, shotst->cast_spell_kind, spell_level, owner, damage_source);
                     struct SpellConfig *spconf = get_spell_config(shotst->cast_spell_kind);
                     if (flag_is_set(spconf->spell_flags, CSAfF_Disease))
                     {
@@ -1066,7 +1071,7 @@ TbBool explosion_affecting_thing(struct Thing *tngsrc, struct Thing *tngdst, con
             {
                 HitPoints damage = get_radially_decaying_value(max_damage, max_dist / 4, 3 * max_dist / 4, distance) + 1;
                 SYNCDBG(7,"Causing %d damage to %s at distance %d",(int)damage,thing_model_name(tngdst),(int)distance);
-                apply_damage_to_thing(tngdst, damage, -1);
+                apply_damage_to_thing(tngdst, damage, -1, tngsrc);
                 affected = true;
                 event_create_event_or_update_nearby_existing_event(tngdst->mappos.x.val, tngdst->mappos.y.val,EvKind_HeartAttacked, tngdst->owner, 0);
                 if (is_my_player_number(tngdst->owner))
@@ -1136,7 +1141,7 @@ TbBool explosion_affecting_door(struct Thing *tngsrc, struct Thing *tngdst, cons
                 }
             }
             SYNCDBG(7,"Causing %d damage to %s at distance %d",(int)damage,thing_model_name(tngdst),(int)distance);
-            apply_damage_to_thing(tngdst, damage, -1);
+            apply_damage_to_thing(tngdst, damage, -1, tngsrc);
             affected = true;
         }
     }
@@ -1446,7 +1451,7 @@ TbBool poison_cloud_affecting_thing(struct Thing *tngsrc, struct Thing *tngdst, 
                         HitPoints damage;
                         damage = get_radially_decaying_value(max_damage, max_dist / 4, 3 * max_dist / 4, distance) + 1;
                         SYNCDBG(7, "Causing %d damage to %s at distance %d", (int)damage, thing_model_name(tngdst), (int)distance);
-                        apply_damage_to_thing_and_display_health(tngdst, damage, tngsrc->owner);
+                        apply_damage_to_thing_and_display_health(tngdst, damage, tngsrc->owner, (tngsrc->class_id == TCls_Shot) ? get_parent_thing(tngsrc) : tngsrc);
                     }
                     break;
                 case AAffT_GasDamageEffect:
@@ -1455,14 +1460,14 @@ TbBool poison_cloud_affecting_thing(struct Thing *tngsrc, struct Thing *tngdst, 
                         HitPoints damage;
                         damage = get_radially_decaying_value(max_damage, 3 * max_dist / 4, max_dist / 4, distance) + 1;
                         SYNCDBG(7, "Causing %d damage to %s at distance %d", (int)damage, thing_model_name(tngdst), (int)distance);
-                        apply_damage_to_thing_and_display_health(tngdst, damage, tngsrc->owner);
+                        apply_damage_to_thing_and_display_health(tngdst, damage, tngsrc->owner, (tngsrc->class_id == TCls_Shot) ? get_parent_thing(tngsrc) : tngsrc);
                     }
                     spconf = get_spell_config(spell_idx);
                     if ((!creature_under_spell_effect(tngdst, spconf->spell_flags)) && (!creature_is_immune_to_spell_effect(tngdst, spconf->spell_flags)))
                     {
                         struct CreatureControl *srcctrl;
                         srcctrl = creature_control_get_from_thing(tngsrc);
-                        apply_spell_effect_to_thing(tngdst, spell_idx, srcctrl->exp_level, tngsrc->owner);
+                        apply_spell_effect_to_thing(tngdst, spell_idx, srcctrl->exp_level, tngsrc->owner, (tngsrc->class_id == TCls_Shot) ? get_parent_thing(tngsrc) : tngsrc);
                     }
                     break;
                 case AAffT_GasEffect:
@@ -1471,7 +1476,7 @@ TbBool poison_cloud_affecting_thing(struct Thing *tngsrc, struct Thing *tngdst, 
                     {
                         struct CreatureControl *srcctrl;
                         srcctrl = creature_control_get_from_thing(tngsrc);
-                        apply_spell_effect_to_thing(tngdst, spell_idx, srcctrl->exp_level, tngsrc->owner);
+                        apply_spell_effect_to_thing(tngdst, spell_idx, srcctrl->exp_level, tngsrc->owner, (tngsrc->class_id == TCls_Shot) ? get_parent_thing(tngsrc) : tngsrc);
                     }
                     break;
                 default:

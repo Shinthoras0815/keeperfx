@@ -1076,7 +1076,7 @@ HitPoints calculate_shot_real_damage_to_door(const struct Thing *doortng, const 
  * @param inflicting_plyr_idx
  * @return Amount of damage really inflicted.
  */
-HitPoints apply_damage_to_thing(struct Thing *thing, HitPoints dmg, PlayerNumber dealing_plyr_idx)
+HitPoints apply_damage_to_thing(struct Thing *thing, HitPoints dmg, PlayerNumber dealing_plyr_idx, struct Thing *source_thing)
 {
     // We're here to damage, not to heal.
     SYNCDBG(19, "Dealing %d damage to %s by player %d", (int)dmg, thing_model_name(thing), (int)dealing_plyr_idx);
@@ -1085,7 +1085,7 @@ HitPoints apply_damage_to_thing(struct Thing *thing, HitPoints dmg, PlayerNumber
     // If it's already dead, then don't interfere.
     if (thing->health < 0)
         return 0;
-    lua_on_apply_damage_to_thing(thing, dmg, dealing_plyr_idx);
+    lua_on_apply_damage_to_thing(thing, dmg, dealing_plyr_idx, source_thing);
 
     HitPoints cdamage;
     switch (thing->class_id)
