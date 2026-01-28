@@ -132,7 +132,11 @@ static const struct luaL_Reg slab_methods[] = {
         lua_pushstring(L, get_conf_parameter_text(slab_desc,slb->kind));
     } else if (strcmp(key, "style") == 0) {
         SlabCodedCoords slb_num = get_slab_number(slb_x, slb_y);
-        lua_pushstring(L, get_conf_parameter_text(texture_pack_desc,game.slab_ext_data[slb_num]));
+        unsigned char texture_id = game.slab_ext_data[slb_num];
+        if (texture_id == 0) {
+            texture_id = game.texture_id;
+        }
+        lua_pushstring(L, get_conf_parameter_text(texture_pack_desc, texture_id));
     } else if (strcmp(key, "centerpos") == 0) {
         struct Coord3d centerpos;
         centerpos.x.val = subtile_coord_center(slab_subtile_center(slb_x));
