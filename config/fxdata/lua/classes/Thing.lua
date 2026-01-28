@@ -30,6 +30,13 @@ function Thing:OnDamage(action)
     RegisterThingDamageEvent(action,self)
 end
 
+---Fires a shot from this thing toward a target (or forward if target is nil).
+---@param target Thing|nil
+---@param shot_model string|integer Shot name from magic.cfg (e.g. "SHOT_FIREBALL") or numeric model id
+---@param shot_level integer
+---@param hit_type? integer Optional THit_* value; if omitted, defaults based on firing/target ownership
+function Thing:fire_shot(target, shot_model, shot_level, hit_type) end
+
 
 ----functions below are implemented in C, so they have no body here
 

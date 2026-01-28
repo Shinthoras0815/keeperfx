@@ -24,6 +24,7 @@
 #include "thing_effects.h"
 #include "magic_powers.h"
 #include "config_crtrstates.h"
+#include "config_magic.h"
 
 #include "lua_base.h"
 #include "lua_params.h"
@@ -37,6 +38,52 @@ static int thing_set_field(lua_State *L);
 static int thing_get_field(lua_State *L);
 
 static const struct luaL_Reg thing_methods[];
+
+static int lua_thing_fire_shot(lua_State *L)
+{
+    struct Thing *firing = luaL_checkThing(L, 1);
+    struct Thing *target = INVALID_THING;
+    if (!lua_isnoneornil(L, 2)) {
+        target = luaL_checkThing(L, 2);
+    }
+
+    ThingModel shot_model = 0;
+    if (lua_isnumber(L, 3)) {
+        shot_model = (ThingModel)lua_tointeger(L, 3);
+    } else {
+        const char* shot_name = luaL_checkstring(L, 3);
+        shot_model = get_id(shot_desc, shot_name);
+        if (shot_model < 0) {
+            return luaL_error(L, "Unknown shot model '%s'", shot_name);
+        }
+    }
+
+    CrtrExpLevel shot_level = (CrtrExpLevel)luaL_checkinteger(L, 4);
+
+    unsigned char hit_type;
+    if (!lua_isnone(L, 5)) {
+        hit_type = (unsigned char)luaL_checkinteger(L, 5);
+    } else if (!thing_is_invalid(target)) {
+        if ((firing->alloc_flags & TAlF_IsControlled) != 0) {
+            if ((target->class_id == TCls_Object) || (target->class_id == TCls_Trap))
+                hit_type = THit_CrtrsNObjcts;
+            else
+                hit_type = THit_CrtrsOnly;
+        } else {
+            if ((target->class_id == TCls_Object) || (target->class_id == TCls_Trap))
+                hit_type = THit_CrtrsNObjctsNotOwn;
+            else if (target->owner == firing->owner)
+                hit_type = THit_CrtrsOnlyOwn;
+            else
+                hit_type = THit_CrtrsOnlyNotOwn;
+        }
+    } else {
+        hit_type = THit_CrtrsOnlyNotOwn;
+    }
+
+    thing_fire_shot(firing, target, shot_model, shot_level, hit_type);
+    return 0;
+}
 
 
 
@@ -567,6 +614,7 @@ static const struct luaL_Reg thing_methods[] = {
     {"walk_to",  lua_creature_walk_to},
     {"kill",    lua_kill_creature},
     {"stun",    lua_stun_creature},
+    {"fire_shot", lua_thing_fire_shot},
     {"delete",     lua_delete_thing},
     {"isValid",         lua_is_valid},
     
