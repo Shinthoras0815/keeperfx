@@ -981,20 +981,28 @@ GoldAmount creature_get_handgold(GoldAmount salary, GoldAmount tribute, struct T
             JUSTLOG("  adding tribute to paid_wage: %d + %d", cctrl->paid_wage, tribute);
             cctrl->paid_wage += tribute;
             JUSTLOG("  new paid_wage: %d", cctrl->paid_wage);
-            // add tribute to the paid wage
-            process_payday_advances(salary, creatng, cctrl, crconf);
-            //return leftover gold as remaining tribute for extra happiness
-            remainingTribute = cctrl->paid_wage;
-            JUSTLOG("  remaining gold after paydays (for extra happiness): %d", remainingTribute);
-            cctrl->paid_wage = 0;
+            if (!during_payday)
+            {
+                // add tribute to the paid wage
+                process_payday_advances(salary, creatng, cctrl, crconf);
+                //return leftover gold as remaining tribute for extra happiness
+                remainingTribute = cctrl->paid_wage;
+                JUSTLOG("  remaining gold after paydays (for extra happiness): %d", remainingTribute);
+                cctrl->paid_wage = 0;
+            }
             //skip current payday
             if(during_payday && (tribute >= salary)){
-                JUSTLOG("  during_payday AND tribute >= salary: reducing paydays_owed and paydays_advanced");
-                JUSTLOG("    before: paydays_owed=%d, paydays_advanced=%d", cctrl->paydays_owed, cctrl->paydays_advanced);
-                cctrl->paydays_owed--;
-                //one salary is already use to skip current payday
-                cctrl->paydays_advanced--;
-                JUSTLOG("    after: paydays_owed=%d, paydays_advanced=%d", cctrl->paydays_owed, cctrl->paydays_advanced);
+                JUSTLOG("  during_payday AND tribute >= salary: reducing paydays_owed and paid_wage");
+                JUSTLOG("    before: paydays_owed=%d, paid_wage=%d", cctrl->paydays_owed, cctrl->paid_wage);
+                if (cctrl->paydays_owed > 0)
+                {
+                    cctrl->paydays_owed--;
+                }
+                if (cctrl->paid_wage >= salary)
+                {
+                    cctrl->paid_wage -= salary;
+                }
+                JUSTLOG("    after: paydays_owed=%d, paid_wage=%d", cctrl->paydays_owed, cctrl->paid_wage);
             }
         }
         // process the tribute during payday
@@ -1014,11 +1022,6 @@ GoldAmount creature_get_handgold(GoldAmount salary, GoldAmount tribute, struct T
             else if(creatng->creature.gold_carried >= salary || tribute >= salary)
             {
                 JUSTLOG("  condition met: gold_carried(%d) >= salary(%d) OR tribute(%d) >= salary", creatng->creature.gold_carried, salary, tribute);
-                // reduce paydays owed if during payday and sufficient wage is paid
-                JUSTLOG("    before: paydays_owed=%d", cctrl->paydays_owed);
-                cctrl->paydays_owed--;
-                JUSTLOG("    after: paydays_owed=%d", cctrl->paydays_owed);
-                process_payday_advances(salary, creatng, cctrl, crconf);
             }
             else
             {
@@ -1026,10 +1029,22 @@ GoldAmount creature_get_handgold(GoldAmount salary, GoldAmount tribute, struct T
             }
 
         }
-        else if (creatng->creature.gold_carried >= salary)
+        if (during_payday)
         {
+            JUSTLOG("PATH: post-payday advances");
             process_payday_advances(salary, creatng, cctrl, crconf);
+            if (!game.conf.rules[creatng->owner].game.pocket_gold)
+            {
+                //return leftover gold as remaining tribute for extra happiness
+                remainingTribute = cctrl->paid_wage;
+                JUSTLOG("  remaining gold after paydays (for extra happiness): %d", remainingTribute);
+                cctrl->paid_wage = 0;
+            }
         }
+        //  else if (creatng->creature.gold_carried >= salary)
+        // {
+        //      process_payday_advances(salary, creatng, cctrl, crconf);
+        //  }
     }
     // accept_partial_payday is true
     else if(game.conf.rules[creatng->owner].game.accept_partial_payday)
