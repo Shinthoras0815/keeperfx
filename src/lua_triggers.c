@@ -216,7 +216,7 @@ void lua_on_level_up(struct Thing *thing)
 	}
 }
 
-void lua_on_slab_change(SlabKind old_slab, MapSlabCoord slb_x, MapSlabCoord slb_y)
+void lua_on_kind_slab_change(SlabKind old_slab, MapSlabCoord slb_x, MapSlabCoord slb_y)
 {
 	SYNCDBG(6,"Starting");
     lua_getglobal(Lvl_script, "OnSlabKindChange");
@@ -225,6 +225,22 @@ void lua_on_slab_change(SlabKind old_slab, MapSlabCoord slb_x, MapSlabCoord slb_
 		lua_pushSlab(Lvl_script, slb_x, slb_y);
 		lua_pushstring(Lvl_script, get_conf_parameter_text(slab_desc, old_slab));  // "DIRT", "PRETTY_PATH", etc.
 		CheckLua(Lvl_script, lua_pcall(Lvl_script, 2, 0, 0),"OnSlabKindChange");
+	}
+	else
+	{
+		lua_pop(Lvl_script, 1);
+	}
+}
+
+void lua_on_slab_owner_change(PlayerNumber old_owner, MapSlabCoord slb_x, MapSlabCoord slb_y)
+{
+	SYNCDBG(6,"Starting");
+    lua_getglobal(Lvl_script, "OnSlabOwnerChange");
+	if (lua_isfunction(Lvl_script, -1))
+	{
+		lua_pushSlab(Lvl_script, slb_x, slb_y);
+		lua_pushPlayer(Lvl_script, old_owner);
+		CheckLua(Lvl_script, lua_pcall(Lvl_script, 2, 0, 0),"OnSlabOwnerChange");
 	}
 	else
 	{
