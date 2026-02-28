@@ -171,34 +171,46 @@ end
 
 ---Triggers when a slab changes
 ---@param action function|string the function to call when the event happens
----@param slab_kind? string the new slab kind to filter on (nil for any)
 ---@param old_slab_kind? string the old slab kind to filter on (nil for any)
+---@param slab_kind? string the new slab kind to filter on (nil for any)
 ---@return table
-function RegisterSlabKindChangeEvent(action, slab_kind, old_slab_kind)
+function RegisterSlabKindChangeEvent(action, old_slab_kind, slab_kind)
     local trigData = {slab_kind = slab_kind, old_slab_kind = old_slab_kind}
     local trigger = CreateTrigger("SlabKindChange", action, trigData)
-    if slab_kind then
-        TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.Slab.kind == triggerData.slab_kind end)
-    end
     if old_slab_kind then
         TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.old_slab_kind == triggerData.old_slab_kind end)
+    end
+    if slab_kind then
+        TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.Slab.kind == triggerData.slab_kind end)
     end
     return trigger
 end
 
 ---Triggers when a slab owner changes
 ---@param action function|string the function to call when the event happens
----@param owner? Player the new owner to filter on (nil for any)
 ---@param old_owner? Player the old owner to filter on (nil for any)
+---@param owner? Player the new owner to filter on (nil for any)
 ---@return table
-function RegisterSlabOwnerChangeEvent(action, owner, old_owner)
+function RegisterSlabOwnerChangeEvent(action, old_owner, owner)
     local trigData = {owner = owner, old_owner = old_owner}
     local trigger = CreateTrigger("SlabOwnerChange", action, trigData)
-    if owner then
-        TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.Slab.owner.playerId == triggerData.owner.playerId end)
-    end
     if old_owner then
         TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.old_owner.playerId == triggerData.old_owner.playerId end)
     end
+    if owner then
+        TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.Slab.owner.playerId == triggerData.owner.playerId end)
+    end
     return trigger
+end
+
+
+---Triggers when a slab kind or owner changes (combines both events)
+---@param action function|string the function to call when the event happens
+---@param old_slab_kind? string the old slab kind to filter on (nil for any)
+---@param slab_kind? string the new slab kind to filter on (nil for any)
+---@param old_owner? Player the old owner to filter on (nil for any)
+---@param owner? Player the new owner to filter on (nil for any)
+function RegisterSlabChangeEvent(action, old_slab_kind, slab_kind, old_owner, owner)
+    RegisterSlabKindChangeEvent(action, old_slab_kind, slab_kind)
+    RegisterSlabOwnerChangeEvent(action, old_owner, owner)
 end

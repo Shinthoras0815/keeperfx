@@ -216,7 +216,7 @@ void lua_on_level_up(struct Thing *thing)
 	}
 }
 
-void lua_on_kind_slab_change(SlabKind old_slab, MapSlabCoord slb_x, MapSlabCoord slb_y)
+void lua_on_slab_kind_change(MapSlabCoord slb_x, MapSlabCoord slb_y, SlabKind old_slab)
 {
 	SYNCDBG(6,"Starting");
     lua_getglobal(Lvl_script, "OnSlabKindChange");
@@ -232,7 +232,7 @@ void lua_on_kind_slab_change(SlabKind old_slab, MapSlabCoord slb_x, MapSlabCoord
 	}
 }
 
-void lua_on_slab_owner_change(PlayerNumber old_owner, MapSlabCoord slb_x, MapSlabCoord slb_y)
+void lua_on_slab_owner_change(MapSlabCoord slb_x, MapSlabCoord slb_y, PlayerNumber old_owner)
 {
 	SYNCDBG(6,"Starting");
     lua_getglobal(Lvl_script, "OnSlabOwnerChange");

@@ -111,10 +111,10 @@ end
 
 --- Called when a slab changed
 ---@param slab Slab
----@param old_slab_owner Player
-function OnSlabKindChange(slab, old_slab_owner)
+---@param old_owner Player
+function OnSlabOwnerChange(slab, old_owner)
     local eventData = {}
     eventData.Slab = slab
-    eventData.old_slab_owner = old_slab_owner
-    ProcessEvent("SlabKindChange",eventData)
+    eventData.old_owner = old_owner
+    ProcessEvent("SlabOwnerChange",eventData)
 end
