@@ -978,19 +978,6 @@ GoldAmount creature_get_handgold(GoldAmount salary, GoldAmount tribute, struct T
 
     GoldAmount remainingTribute = 0;
 
-    // Store tribute into gold source (pocket or paid_wage)
-    if (game.conf.rules[creatng->owner].game.pocket_gold)
-    {
-        JUSTLOG("  pocket_gold active, calling handle_pocket_gold_rule");
-        remainingTribute = handle_pocket_gold_rule(tribute, creatng, crconf, cctrl);
-        JUSTLOG("  pocket overflow (remainingTribute)=%d", remainingTribute);
-    }
-    else
-    {
-        JUSTLOG("  adding tribute to paid_wage: %d + %d = %d", cctrl->paid_wage, tribute, cctrl->paid_wage + tribute);
-        cctrl->paid_wage += tribute;
-    }
-
     // If accept_partial_payday and during_payday, a single drop always counts as one payment
     if (game.conf.rules[creatng->owner].game.accept_partial_payday && during_payday && cctrl->paydays_owed > 0)
     {
@@ -999,12 +986,39 @@ GoldAmount creature_get_handgold(GoldAmount salary, GoldAmount tribute, struct T
         cctrl->paydays_owed--;
     }
 
-    // Process full payday payments (owed first, then advanced)
-    process_payday_payments(salary, creatng, cctrl, crconf);
-
-    // Handle leftover gold
-    if (!game.conf.rules[creatng->owner].game.pocket_gold)
+    if (game.conf.rules[creatng->owner].game.pocket_gold)
     {
+        // Pocket gold path: pay first, then pocket the rest
+        // Temporarily add tribute to pocket (may exceed gold_hold)
+        JUSTLOG("  pocket_gold: adding tribute to pocket for payday processing");
+        JUSTLOG("    gold_carried: %d + %d = %d (may exceed gold_hold %d)",
+                creatng->creature.gold_carried, tribute,
+                creatng->creature.gold_carried + tribute, crconf->gold_hold);
+        creatng->creature.gold_carried += tribute;
+
+        // Pay paydays from combined pocket+tribute pool
+        process_payday_payments(salary, creatng, cctrl, crconf);
+        JUSTLOG("  after paydays: gold_carried=%d, gold_hold=%d",
+                creatng->creature.gold_carried, crconf->gold_hold);
+
+        // Cap pocket at gold_hold, overflow goes to happiness
+        if (creatng->creature.gold_carried > crconf->gold_hold)
+        {
+            remainingTribute = creatng->creature.gold_carried - crconf->gold_hold;
+            creatng->creature.gold_carried = crconf->gold_hold;
+            JUSTLOG("  capping pocket: overflow %d -> happiness, pocket=%d",
+                    remainingTribute, creatng->creature.gold_carried);
+        }
+    }
+    else
+    {
+        // Non-pocket path: store tribute in paid_wage, then process payments
+        JUSTLOG("  adding tribute to paid_wage: %d + %d = %d", cctrl->paid_wage, tribute, cctrl->paid_wage + tribute);
+        cctrl->paid_wage += tribute;
+
+        process_payday_payments(salary, creatng, cctrl, crconf);
+
+        // Handle leftover gold
         TbBool clear_paid_wage = game.conf.rules[creatng->owner].game.accept_partial_payday
                               || game.conf.rules[creatng->owner].game.max_paydays_owed == 0
                               || (during_payday && cctrl->paydays_owed == 0);
