@@ -139,7 +139,7 @@ function RegisterOnActionPointEvent(action, actionPoint, player)
     local trigData = {Player = player,actionPoint = actionPoint, triggered = false}
 
     local trigger = CreateTrigger("GameTick",action,trigData)
-    TriggerAddCondition(trigger, function(eventData,triggerData)  
+    TriggerAddCondition(trigger, function(eventData,triggerData)
                                         if triggerData.triggered == false then
                                             triggerData.triggered = IsActionpointActivatedByPlayer(triggerData.Player,triggerData.actionPoint)
                                             return triggerData.triggered
@@ -165,6 +165,23 @@ function RegisterLevelUpEvent(action, creature)
     local trigger = CreateTrigger("LevelUp",action,trigData)
     if creature then
         TriggerAddCondition(trigger, function(eventData,triggerData) return eventData.creature == triggerData.creature end)
+    end
+    return trigger
+end
+
+---Triggers when a slab changes
+---@param action function|string the function to call when the event happens
+---@param slab_kind? string the new slab kind to filter on (nil for any)
+---@param old_slab_kind? string the old slab kind to filter on (nil for any)
+---@return table
+function RegisterSlabKindChangeEvent(action, slab_kind, old_slab_kind)
+    local trigData = {slab_kind = slab_kind, old_slab_kind = old_slab_kind}
+    local trigger = CreateTrigger("SlabKindChange", action, trigData)
+    if slab_kind then
+        TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.Slab.kind == triggerData.slab_kind end)
+    end
+    if old_slab_kind then
+        TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.old_slab_kind == triggerData.old_slab_kind end)
     end
     return trigger
 end
