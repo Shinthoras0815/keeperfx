@@ -178,7 +178,10 @@ void set_slab_owner(MapSlabCoord slb_x, MapSlabCoord slb_y, PlayerNumber owner)
         game.slab_ext_data[get_slab_number(slb_x,slb_y)] = dungeon->texture_pack;
     }
     slb->owner = owner;
-    lua_on_slab_owner_change(slb_x, slb_y, old_owner);
+    if(old_owner != owner)
+    {
+        lua_on_slab_owner_change(slb_x, slb_y, old_owner);
+    }
 }
 
 /**

@@ -1597,7 +1597,10 @@ void place_animating_slab_type_on_map(SlabKind slbkind, char ani_frame, MapSubtl
     {
         remove_unwanted_things_from_wall_slab(slb_x, slb_y);
     }
-    lua_on_slab_kind_change(slb_x, slb_y, old_kind);
+        if (slbmap->kind != old_kind)
+        {
+            lua_on_slab_kind_change(slb_x, slb_y, old_kind);
+        }
 }
 
 /**
@@ -1802,7 +1805,10 @@ void place_slab_type_on_map_f(SlabKind nslab, MapSubtlCoord stl_x, MapSubtlCoord
         default:
             break;
     }
-    lua_on_slab_kind_change(slb_x, slb_y, old_kind);
+    if (old_kind != nslab)
+    {
+        lua_on_slab_kind_change(slb_x, slb_y, old_kind);
+    }
 }
 
 void replace_map_slab_when_destroyed(MapSlabCoord slb_x, MapSlabCoord slb_y)

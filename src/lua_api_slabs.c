@@ -142,12 +142,12 @@ static const struct luaL_Reg slab_methods[] = {
         lua_pushPos(L, &centerpos);
         return 1;
     } else if (strcmp(key, "room") == 0) {
-    struct Room *room = slab_room_get(slb_x, slb_y);
-    if (room_is_invalid(room)) {
-        lua_pushnil(L);
-    } else {
-        lua_pushRoom(L, room);
-    }
+        struct Room *room = slab_room_get(slb_x, slb_y);
+        if (room_is_invalid(room)) {
+            lua_pushnil(L);
+        } else {
+            lua_pushRoom(L, room);
+        }
     } else if (try_get_from_methods(L, 1, key)) {
         return 1;
     } else {
