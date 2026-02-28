@@ -170,6 +170,7 @@ function RegisterLevelUpEvent(action, creature)
 end
 
 ---Triggers when a slab changes
+---eventData.Slab contains the changed slab and the new kind
 ---@param action function|string the function to call when the event happens
 ---@param old_slab_kind? string the old slab kind to filter on (nil for any)
 ---@param slab_kind? string the new slab kind to filter on (nil for any)
@@ -187,6 +188,7 @@ function RegisterSlabKindChangeEvent(action, old_slab_kind, slab_kind)
 end
 
 ---Triggers when a slab owner changes
+---eventData.Slab contains the changed slab and its new owner
 ---@param action function|string the function to call when the event happens
 ---@param old_owner? Player the old owner to filter on (nil for any)
 ---@param owner? Player the new owner to filter on (nil for any)
@@ -203,14 +205,20 @@ function RegisterSlabOwnerChangeEvent(action, old_owner, owner)
     return trigger
 end
 
-
----Triggers when a slab kind or owner changes (combines both events)
+---Triggers when a room changes owner
+---eventData.Room contains the changed room and its new owner
 ---@param action function|string the function to call when the event happens
----@param old_slab_kind? string the old slab kind to filter on (nil for any)
----@param slab_kind? string the new slab kind to filter on (nil for any)
 ---@param old_owner? Player the old owner to filter on (nil for any)
 ---@param owner? Player the new owner to filter on (nil for any)
-function RegisterSlabChangeEvent(action, old_slab_kind, slab_kind, old_owner, owner)
-    RegisterSlabKindChangeEvent(action, old_slab_kind, slab_kind)
-    RegisterSlabOwnerChangeEvent(action, old_owner, owner)
+---@return table
+function RegisterRoomOwnerChangeEvent(action, old_owner, owner)
+    local trigData = {owner = owner, old_owner = old_owner}
+    local trigger = CreateTrigger("RoomOwnerChange", action, trigData)
+    if old_owner then
+        TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.old_owner.playerId == triggerData.old_owner.playerId end)
+    end
+    if owner then
+        TriggerAddCondition(trigger, function(eventData, triggerData) return eventData.Room.owner.playerId == triggerData.owner.playerId end)
+    end
+    return trigger
 end

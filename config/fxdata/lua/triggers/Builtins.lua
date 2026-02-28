@@ -2,7 +2,7 @@
 -- Entry points for engine-triggered events (e.g. OnPowerCast, OnGameTick).
 -- These functions are called by the C engine and dispatch event data to the Lua trigger system.
 
----@alias event_type "PowerCast"|"Death"|"SpecialActivated"|"GameTick"|"ChatMsg"|"DungeonDestroyed"|"TrapPlaced"|"ApplyDamage"|"LevelUp"|"Rebirth"|"SlabKindChange"|"SlabOwnerChange"
+---@alias event_type "PowerCast"|"Death"|"SpecialActivated"|"GameTick"|"ChatMsg"|"DungeonDestroyed"|"TrapPlaced"|"ApplyDamage"|"LevelUp"|"Rebirth"|"SlabKindChange"|"SlabOwnerChange"|"RoomOwnerChange"
 
 --- Called when a spell is cast on a unit
 --- @param pwkind power_kind
@@ -109,7 +109,7 @@ function OnSlabKindChange(slab, old_slab_kind)
     ProcessEvent("SlabKindChange",eventData)
 end
 
---- Called when a slab changed
+--- Called when a slab owner changed
 ---@param slab Slab
 ---@param old_owner Player
 function OnSlabOwnerChange(slab, old_owner)
@@ -117,4 +117,14 @@ function OnSlabOwnerChange(slab, old_owner)
     eventData.Slab = slab
     eventData.old_owner = old_owner
     ProcessEvent("SlabOwnerChange",eventData)
+end
+
+--- Called when a room changes owner
+---@param room Room
+---@param old_owner Player
+function OnRoomOwnerChange(room, old_owner)
+    local eventData = {}
+    eventData.Room = room
+    eventData.old_owner = old_owner
+    ProcessEvent("RoomOwnerChange",eventData)
 end

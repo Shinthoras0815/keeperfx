@@ -17,6 +17,7 @@
 #include "config_magic.h"
 #include "config_terrain.h"
 #include "globals.h"
+#include "room_data.h"
 #include "thing_data.h"
 
 
@@ -216,6 +217,7 @@ void lua_on_level_up(struct Thing *thing)
 	}
 }
 
+// Called when a slab type changes (e.g. pretty_path -> hatchery_area, path -> pretty_path)
 void lua_on_slab_kind_change(MapSlabCoord slb_x, MapSlabCoord slb_y, SlabKind old_slab)
 {
 	SYNCDBG(6,"Starting");
@@ -232,6 +234,7 @@ void lua_on_slab_kind_change(MapSlabCoord slb_x, MapSlabCoord slb_y, SlabKind ol
 	}
 }
 
+// Called when a single slab changes owner (e.g. claiming a path tile).
 void lua_on_slab_owner_change(MapSlabCoord slb_x, MapSlabCoord slb_y, PlayerNumber old_owner)
 {
 	SYNCDBG(6,"Starting");
@@ -241,6 +244,23 @@ void lua_on_slab_owner_change(MapSlabCoord slb_x, MapSlabCoord slb_y, PlayerNumb
 		lua_pushSlab(Lvl_script, slb_x, slb_y);
 		lua_pushPlayer(Lvl_script, old_owner);
 		CheckLua(Lvl_script, lua_pcall(Lvl_script, 2, 0, 0),"OnSlabOwnerChange");
+	}
+	else
+	{
+		lua_pop(Lvl_script, 1);
+	}
+}
+
+// Called once when an entire room changes owner
+void lua_on_room_owner_change(struct Room *room, PlayerNumber old_owner)
+{
+	SYNCDBG(6,"Starting");
+	lua_getglobal(Lvl_script, "OnRoomOwnerChange");
+	if (lua_isfunction(Lvl_script, -1))
+	{
+		lua_pushRoom(Lvl_script, room);
+		lua_pushPlayer(Lvl_script, old_owner);
+		CheckLua(Lvl_script, lua_pcall(Lvl_script, 2, 0, 0),"OnRoomOwnerChange");
 	}
 	else
 	{
