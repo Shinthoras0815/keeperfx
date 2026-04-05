@@ -19,6 +19,8 @@
 #include "config_objects.h"
 #include "config_trapdoor.h"
 
+#include "lua_thread.h"
+
 #include "post_inc.h"
 
 #ifdef __cplusplus
@@ -55,6 +57,7 @@ TbBool CheckLua(lua_State *L, int result, const char* func)
 
 void close_lua_script()
 {
+    lua_thread_shutdown();
     if(Lvl_script)
         lua_close(Lvl_script);
     Lvl_script = NULL;
@@ -205,6 +208,8 @@ TbBool open_lua_script(LevelNumber lvnum)
         ERRORLOG("failed to load lua script");
         return false;
 	}
+
+    lua_thread_init();
 
     return true;
 }
