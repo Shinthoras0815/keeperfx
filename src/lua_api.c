@@ -29,6 +29,7 @@
 #include "lua_base.h"
 #include "lua_params.h"
 #include "lua_api_lens.h"
+#include "lua_thread.h"
 
 
 #include "post_inc.h"
@@ -2350,4 +2351,5 @@ void reg_host_functions(lua_State *L)
     Slab_register(L);
     room_register(L);
     Lens_register(L);
+    lua_thread_register_functions(L);
 }
